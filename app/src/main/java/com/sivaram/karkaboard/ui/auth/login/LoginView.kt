@@ -394,6 +394,7 @@ fun LoginViewContent(
                             }
                             IconButton(
                                 onClick = {
+                                    Toast.makeText(context, "Password Toggle", Toast.LENGTH_SHORT).show()
                                     showPassword = !showPassword
                                 },
                                 modifier = Modifier.size(25.dp),
