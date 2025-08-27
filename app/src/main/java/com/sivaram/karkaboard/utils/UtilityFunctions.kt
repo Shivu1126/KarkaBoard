@@ -20,4 +20,8 @@ object UtilityFunctions {
         cursor?.close()
         return name
     }
+    fun isEndWithRole(email: String): Boolean {
+
+        return false
+    }
 }

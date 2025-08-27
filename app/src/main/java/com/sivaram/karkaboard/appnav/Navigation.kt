@@ -6,9 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.sivaram.karkaboard.appconstants.NavConstants
-import com.sivaram.karkaboard.ui.HomeView
-import com.sivaram.karkaboard.ui.LoginView
-import com.sivaram.karkaboard.ui.RegisterView
+import com.sivaram.karkaboard.ui.home.HomeView
+import com.sivaram.karkaboard.ui.auth.login.LoginView
+import com.sivaram.karkaboard.ui.auth.register.RegisterView
 
 @Composable
 fun Navigation( navController: NavHostController, context: Context){

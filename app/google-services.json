@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "934079991185",
+    "project_id": "karkaboard-b3a6b",
+    "storage_bucket": "karkaboard-b3a6b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:934079991185:android:e0111d1c4262836a42de30",
+        "android_client_info": {
+          "package_name": "com.sivaram.karkaboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "934079991185-36102u8bohvp0h5vj4n3kica5c23i51v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sivaram.karkaboard",
+            "certificate_hash": "cd8b2cb6cdcd980882fd579ba7e234c7b3175461"
+          }
+        },
+        {
+          "client_id": "934079991185-d6p6bak4ml92u1hc86mbdtl48stpblja.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNqL0eCiVcxSf03tQxruYGVUnRnNyUw8I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "934079991185-d6p6bak4ml92u1hc86mbdtl48stpblja.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
