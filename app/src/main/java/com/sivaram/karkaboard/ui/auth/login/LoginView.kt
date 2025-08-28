@@ -22,19 +22,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -64,12 +69,18 @@ import androidx.navigation.compose.rememberNavController
 import com.sivaram.karkaboard.R
 import com.sivaram.karkaboard.appconstants.NavConstants
 import com.sivaram.karkaboard.data.dto.RolesData
+import com.sivaram.karkaboard.data.dto.StudentsData
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeRepo
+import com.sivaram.karkaboard.ui.auth.register.OtpInput
+import com.sivaram.karkaboard.ui.auth.register.ResendOtpTimer
 import com.sivaram.karkaboard.ui.auth.state.LoginState
+import com.sivaram.karkaboard.ui.auth.state.VerifyState
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
 import com.sivaram.karkaboard.ui.theme.overpassMonoBold
 import com.sivaram.karkaboard.ui.theme.overpassMonoMedium
+import com.sivaram.karkaboard.utils.UtilityFunctions
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -88,6 +99,7 @@ fun LoginView(navController: NavController, context: Context, loginViewModel: Lo
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("AutoboxingStateCreation")
 @Composable
 fun LoginViewContent(
@@ -111,6 +123,11 @@ fun LoginViewContent(
 
     var mailEnd by rememberSaveable { mutableStateOf("") }
 
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+    )
+    var bottomSheetVisibility by rememberSaveable { mutableStateOf(false) }
+
 // Update mailEnd when rolesData changes
     LaunchedEffect(roleItemData) {
         if (roleItemData.isNotEmpty()) {
@@ -124,6 +141,10 @@ fun LoginViewContent(
 
     var coroutineScope = rememberCoroutineScope()
 
+    var mobile by rememberSaveable { mutableStateOf("") }
+    var otpText by rememberSaveable { mutableStateOf("") }
+    val verifyState by loginViewModel.verifyState.collectAsState()
+
     val brush = Brush.verticalGradient(
         listOf(MaterialTheme.colorScheme.inversePrimary, MaterialTheme.colorScheme.onPrimaryContainer),
         startY = 0.0f,
@@ -134,6 +155,118 @@ fun LoginViewContent(
             .fillMaxSize()
             .background(brush)
     ) {
+
+        if (bottomSheetVisibility) {
+            ModalBottomSheet(
+                modifier = Modifier.fillMaxSize(),
+                sheetState = bottomSheetState,
+                onDismissRequest = { bottomSheetVisibility = !bottomSheetVisibility },
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                dragHandle = {
+                    BottomSheetDefaults.DragHandle(
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(
+                        30.dp,
+                        alignment = Alignment.CenterVertically
+                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(70.dp),
+                        painter = painterResource(R.drawable.ic_otp),
+                        contentDescription = "OTP Icon",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "You'll receive an OTP on your registered mobile number ending in $mobile ",
+//                                "${
+//                                    mobileNo.let {
+//                                        "*".repeat(7) + it.substring(it.length - 3)
+//                                    }
+//                                }.",
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontWeight = MaterialTheme.typography.headlineLarge.fontWeight,
+                            fontFamily = overpassMonoBold
+                        )
+                    )
+                    OtpInput(
+                        otpLength = 6,
+                        onOtpComplete = {
+                            otpText = it
+                            Log.d("otpText", otpText)
+                        }
+                    )
+
+                    OutlinedButton(
+                        enabled = verifyState !is VerifyState.Loading,
+                        onClick = {
+
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .padding(horizontal = 50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            contentColor = MaterialTheme.colorScheme.secondaryContainer,
+                            disabledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                alpha = 0.5f
+                            ),
+                            disabledContentColor = MaterialTheme.colorScheme.secondaryContainer.copy(
+                                alpha = 0.5f
+                            ),
+                        ),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.inversePrimary),
+                    ) {
+
+                        when (val state = verifyState) {
+                            is VerifyState.Error -> {
+                                Log.d("verify-error", state.message)
+                                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                                loginViewModel.resetVerifyState()
+                            }
+
+                            VerifyState.Idle -> {
+                                Text(
+                                    text = "Verify OTP",
+                                    style = TextStyle(
+                                        fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                                        fontWeight = MaterialTheme.typography.headlineLarge.fontWeight,
+                                        fontFamily = overpassMonoBold
+                                    )
+                                )
+                            }
+
+                            VerifyState.Loading -> {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    modifier = Modifier.size(25.dp),
+                                    strokeWidth = 4.dp
+                                )
+                            }
+
+                            is VerifyState.Success -> {
+                                Log.d("verify-success", state.message)
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -298,7 +431,10 @@ fun LoginViewContent(
                                                     onClick = {
                                                         mailEnd = it.content
                                                         mailEndIndex = roleItemData.indexOf(it)
-                                                        Log.d("MailChange", "mailEndIndex -> $mailEndIndex")
+                                                        Log.d(
+                                                            "MailChange",
+                                                            "mailEndIndex -> $mailEndIndex"
+                                                        )
                                                         if (mailEndIndex == 0) {
                                                             Toast.makeText(
                                                                 context,
@@ -394,7 +530,6 @@ fun LoginViewContent(
                             }
                             IconButton(
                                 onClick = {
-                                    Toast.makeText(context, "Password Toggle", Toast.LENGTH_SHORT).show()
                                     showPassword = !showPassword
                                 },
                                 modifier = Modifier.size(25.dp),
@@ -416,7 +551,40 @@ fun LoginViewContent(
                     ){
                         TextButton(
                             onClick = {
+                                if(email.trim().isEmpty()){
+                                    Toast.makeText(context, "Please enter registered email id", Toast.LENGTH_SHORT).show()
+                                }
+                                else{
+                                    loginViewModel.checkEnd(email.trim(), mailEndIndex, roleItemData){
+                                            isNotAllowed, email ->
+                                        if(isNotAllowed){
+                                            Toast.makeText(context, "Please select proper role !!", Toast.LENGTH_SHORT).show()
+                                        }
+                                        else {
+                                            loginViewModel.getMobileNoByMail(email){
+                                                isMobileNoExist, mobileNumber ->
+                                                    Log.d("phoneBook", "mobileNoExist: $isMobileNoExist")
+                                                    if(isMobileNoExist){
+                                                        mobile = mobileNumber
+                                                        bottomSheetVisibility = true
+//                                                        Toast.makeText(
+//                                                            context,
+//                                                            "OTP sent to $mobileNumber",
+//                                                            Toast.LENGTH_SHORT
+//                                                        ).show()
 
+                                                    }
+                                                    else{
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Please enter registered mail id",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                            }
+                                        }
+                                    }
+                                }
                             },
                         ) {
                             Text(

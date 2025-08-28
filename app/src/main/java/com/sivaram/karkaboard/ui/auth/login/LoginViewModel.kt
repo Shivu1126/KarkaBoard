@@ -1,5 +1,6 @@
 package com.sivaram.karkaboard.ui.auth.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.state.LoginState
+import com.sivaram.karkaboard.ui.auth.state.VerifyState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,9 @@ class LoginViewModel @Inject constructor(
     private val _rolesList = MutableLiveData<List<RolesData>>(emptyList())
     val rolesList: LiveData<List<RolesData>> = _rolesList
 
+    private val _verifyState = MutableStateFlow<VerifyState>(VerifyState.Idle)
+    val verifyState: StateFlow<VerifyState> = _verifyState
+
     fun login(email: String, password: String){
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
@@ -40,7 +45,35 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun getMobileNoByMail(email: String, onResult: (Boolean, String) -> Unit){
+        viewModelScope.launch {
+            authRepository.getMobileNoByMail(email, onResult)
+        }
+    }
+
+    fun checkEnd(emailId: String, mailEndIndex: Int, roleItemData: List<RolesData>, onResult: (Boolean, String) -> Unit){
+        var isEnd = false
+        var mailEnd = ""
+        if (mailEndIndex != 0) {
+            if(! emailId.endsWith(roleItemData[mailEndIndex].content)){
+                mailEnd = roleItemData[mailEndIndex].content
+            }
+        }
+        else{
+            roleItemData.forEach {
+                if (emailId.endsWith(it.content)) {
+                    isEnd = true
+                }
+            }
+        }
+        onResult(isEnd, emailId+mailEnd)
+    }
+
     fun resetLoginState(){
         _loginState.value = LoginState.Idle
+    }
+
+    fun resetVerifyState(){
+        _verifyState.value = VerifyState.Idle
     }
 }

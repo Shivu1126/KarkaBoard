@@ -21,4 +21,5 @@ interface AuthRepository {
 
     suspend fun registerStudentDetails(studentsData: StudentsData, onResult: (Boolean) -> Unit)
     suspend fun login(email: String, password: String): LoginState
+    suspend fun getMobileNoByMail(email: String, onResult: (Boolean, String) -> Unit)
 }

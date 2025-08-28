@@ -32,12 +32,7 @@ class AuthRepositoryImpl : AuthRepository {
         onResult: (Boolean, String) -> Unit
     ) {
         return try {
-            val emailDocs = firestore.collection(DbConstants.USER_TABLE)
-                .whereEqualTo("email", email)
-                .get()
-                .await()
-
-            if (!emailDocs.isEmpty) {
+            if (isEmailAlreadyInUse(email)) {
                 return onResult(true, "User Already Exist !")
             }
 
@@ -173,5 +168,37 @@ class AuthRepositoryImpl : AuthRepository {
         catch (e: Exception){
             LoginState.Error("Check your MailId and Password")
         }
+    }
+
+    override suspend fun getMobileNoByMail(
+        email: String,
+        onResult: (Boolean, String) -> Unit
+    ){
+        return try {
+            if(isEmailAlreadyInUse(email)){
+                val mobileNumber = firestore.collection(DbConstants.USER_TABLE)
+                    .whereEqualTo("email", email)
+                    .get()
+                    .await().documents[0].get("mobile").toString()
+                Log.d("phoneBook", "emailDocs: mobile no $mobileNumber")
+                onResult(true, mobileNumber)
+            } else {
+                Log.d("phoneBook", "emailDocs: mobile no null")
+                onResult(false, "null")
+            }
+        }
+        catch (e: Exception){
+            Log.d("phoneBook", e.localizedMessage ?: "Check failed", e)
+            onResult(false, "null")
+        }
+    }
+
+    private suspend fun isEmailAlreadyInUse(email: String): Boolean {
+        val emailDocs = firestore.collection(DbConstants.USER_TABLE)
+            .whereEqualTo("email", email)
+            .get()
+            .await()
+
+        return !emailDocs.isEmpty
     }
 }

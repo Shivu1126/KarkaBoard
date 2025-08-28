@@ -49,4 +49,8 @@ class FakeRepo : AuthRepository {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getMobileNoByMail(email: String, onResult: (Boolean, String) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
 }
