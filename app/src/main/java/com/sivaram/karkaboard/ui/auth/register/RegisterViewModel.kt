@@ -16,6 +16,7 @@ import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.ValidationState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
+import com.sivaram.karkaboard.ui.auth.utils.AuthUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,6 +43,9 @@ class RegisterViewModel @Inject constructor(
 
     private val _validationState = MutableLiveData<ValidationState>()
     val validationState: LiveData<ValidationState> = _validationState
+
+    private val _otp = MutableStateFlow(List(6) { "" }) // 6 boxes
+    val otp: StateFlow<List<String>> = _otp
 
     val rolesData: LiveData<List<RolesData>> = databaseRepository.getRoles()
 
@@ -100,7 +104,7 @@ class RegisterViewModel @Inject constructor(
             _validationState.value = ValidationState.Error("Please enter valid email")
             return
         }
-        if (password.isEmpty() || !validatePassword(password) ) {
+        if (password.isEmpty() || !AuthUtils.validatePassword(password) ) {
             _validationState.value = ValidationState.Error("Please enter valid password")
             return
         }
@@ -150,10 +154,7 @@ class RegisterViewModel @Inject constructor(
         val mobileRegex = Regex("^[0-9]{10}$")
         return mobileRegex.matches(mobile)
     }
-    private fun validatePassword(password: String): Boolean {
-        val passwordRegex = Regex("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")
-        return passwordRegex.matches(password)
-    }
+
     private fun calculateAge(dob: String): Int{
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val dob = sdf.parse(dob) ?: return -1
@@ -168,6 +169,14 @@ class RegisterViewModel @Inject constructor(
             age--
         }
         return age
+    }
+
+    fun updateOtp(index: Int, value: String) {
+        _otp.value = _otp.value.toMutableList().also { it[index] = value }
+    }
+
+    fun clearOtp() {
+        _otp.value = List(6) { "" }
     }
 
     fun resetAuthFlowState() {

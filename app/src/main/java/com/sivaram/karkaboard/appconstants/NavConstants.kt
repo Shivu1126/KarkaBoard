@@ -5,4 +5,5 @@ object NavConstants {
     const val HOME = "home"
     const val LOGIN = "login"
     const val REGISTER = "register"
+    const val RESET_PASSWORD = "reset_password"
 }

@@ -89,4 +89,5 @@ dependencies {
     implementation (libs.play.services.auth.api.phone)
     implementation(libs.firebase.appcheck.playintegrity)
 
+    implementation (libs.androidx.datastore.preferences)
 }

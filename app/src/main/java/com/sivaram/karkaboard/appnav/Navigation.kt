@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.sivaram.karkaboard.appconstants.NavConstants
+import com.sivaram.karkaboard.ui.auth.forgetpassword.ResetPasswordView
 import com.sivaram.karkaboard.ui.home.HomeView
 import com.sivaram.karkaboard.ui.auth.login.LoginView
 import com.sivaram.karkaboard.ui.auth.register.RegisterView
@@ -24,6 +25,9 @@ fun Navigation( navController: NavHostController, context: Context){
         }
         composable(NavConstants.REGISTER){
             RegisterView(navController, context)
+        }
+        composable(NavConstants.RESET_PASSWORD){
+            ResetPasswordView(navController,context)
         }
     }
 }

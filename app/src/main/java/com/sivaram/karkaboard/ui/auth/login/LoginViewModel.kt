@@ -1,19 +1,24 @@
 package com.sivaram.karkaboard.ui.auth.login
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.PhoneAuthProvider
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
+import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,6 +35,14 @@ class LoginViewModel @Inject constructor(
     private val _verifyState = MutableStateFlow<VerifyState>(VerifyState.Idle)
     val verifyState: StateFlow<VerifyState> = _verifyState
 
+    private val _otp = MutableStateFlow(List(6) { "" }) // 6 boxes
+    val otp: StateFlow<List<String>> = _otp
+
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    private val _authFlowState = MutableStateFlow<AuthFlowState>(AuthFlowState.Idle)
+    val authFlowState: StateFlow<AuthFlowState> = _authFlowState
+
     fun login(email: String, password: String){
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
@@ -45,7 +58,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun getMobileNoByMail(email: String, onResult: (Boolean, String) -> Unit){
+    fun getMobileNoByMail(email: String, onResult: (Boolean, String, String) -> Unit){
         viewModelScope.launch {
             authRepository.getMobileNoByMail(email, onResult)
         }
@@ -69,11 +82,55 @@ class LoginViewModel @Inject constructor(
         onResult(isEnd, emailId+mailEnd)
     }
 
+    fun getOtp(
+        mobileNumber: String,
+        context: Context,
+        onTimeOut: (AuthFlowState.OtpTimeout) -> Unit
+    ) {
+        viewModelScope.launch {
+            _authFlowState.value = AuthFlowState.Loading
+            _authFlowState.value = authRepository.getOtp(mobileNumber, context, onTimeOut)
+        }
+    }
+
+    fun updateOtp(index: Int, value: String) {
+        _otp.value = _otp.value.toMutableList().also { it[index] = value }
+    }
+
+    fun verifyCredential(verificationId: String, otp: String) {
+        viewModelScope.launch {
+            _verifyState.value = VerifyState.Loading
+            _verifyState.value = verifyOtp(verificationId, otp)
+        }
+    }
+
+    private suspend fun verifyOtp(verificationId: String, otp: String): VerifyState{
+        return try{
+            val credential = PhoneAuthProvider.getCredential(verificationId, otp)
+            val authResult = auth.signInWithCredential(credential).await()
+            val user = authResult.user
+            if(user != null){
+                VerifyState.Success("Verification successful", user.uid)
+            }
+            else{
+                VerifyState.Error("Verification failed")
+            }
+        }
+        catch (e: Exception){
+            VerifyState.Error("Verification failed")
+        }
+    }
+
+
     fun resetLoginState(){
         _loginState.value = LoginState.Idle
     }
 
     fun resetVerifyState(){
         _verifyState.value = VerifyState.Idle
+    }
+
+    fun resetAuthFlowState() {
+        _authFlowState.value = AuthFlowState.Idle
     }
 }

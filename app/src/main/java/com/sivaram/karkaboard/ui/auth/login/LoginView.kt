@@ -70,10 +70,12 @@ import com.sivaram.karkaboard.R
 import com.sivaram.karkaboard.appconstants.NavConstants
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StudentsData
+import com.sivaram.karkaboard.data.local.ResetPasswordPref
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeRepo
 import com.sivaram.karkaboard.ui.auth.register.OtpInput
 import com.sivaram.karkaboard.ui.auth.register.ResendOtpTimer
+import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
@@ -100,7 +102,7 @@ fun LoginView(navController: NavController, context: Context, loginViewModel: Lo
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("AutoboxingStateCreation")
+@SuppressLint("AutoboxingStateCreation", "CoroutineCreationDuringComposition")
 @Composable
 fun LoginViewContent(
     navController: NavController, context: Context, loginViewModel: LoginViewModel
@@ -113,6 +115,7 @@ fun LoginViewContent(
 //    val roleItemDate = listOf(
 //        "I'm Student","@karkaadmin.com","@karkahr.com","@karkafaculty.com","@karkapanelist.com"
 //    )
+    var verificationId by rememberSaveable { mutableStateOf("") }
 
     val rolesData by loginViewModel.rolesList.observeAsState()
     LaunchedEffect(true) {
@@ -142,8 +145,14 @@ fun LoginViewContent(
     var coroutineScope = rememberCoroutineScope()
 
     var mobile by rememberSaveable { mutableStateOf("") }
+    var countryNo by rememberSaveable { mutableStateOf("") }
     var otpText by rememberSaveable { mutableStateOf("") }
     val verifyState by loginViewModel.verifyState.collectAsState()
+
+    val authFlowState by loginViewModel.authFlowState.collectAsState()
+
+
+    val otp by loginViewModel.otp.collectAsState()
 
     val brush = Brush.verticalGradient(
         listOf(MaterialTheme.colorScheme.inversePrimary, MaterialTheme.colorScheme.onPrimaryContainer),
@@ -187,12 +196,12 @@ fun LoginViewContent(
 
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "You'll receive an OTP on your registered mobile number ending in $mobile ",
-//                                "${
-//                                    mobileNo.let {
-//                                        "*".repeat(7) + it.substring(it.length - 3)
-//                                    }
-//                                }.",
+                        text = "You'll receive an OTP on your registered mobile number ending in $countryNo "+
+                                "${
+                                    mobile.let {
+                                        "*".repeat(7) + it.substring(it.length - 3)
+                                    }
+                                }.",
                         style = TextStyle(
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
@@ -201,7 +210,8 @@ fun LoginViewContent(
                         )
                     )
                     OtpInput(
-                        otpLength = 6,
+                        otpValues = otp,
+                        onOtpChange = {index, value -> loginViewModel.updateOtp(index, value)},
                         onOtpComplete = {
                             otpText = it
                             Log.d("otpText", otpText)
@@ -211,7 +221,7 @@ fun LoginViewContent(
                     OutlinedButton(
                         enabled = verifyState !is VerifyState.Loading,
                         onClick = {
-
+                            loginViewModel.verifyCredential(verificationId, otpText)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -259,7 +269,12 @@ fun LoginViewContent(
 
                             is VerifyState.Success -> {
                                 Log.d("verify-success", state.message)
-
+                                coroutineScope.launch {
+                                    ResetPasswordPref.setResetInProgress(context, true)
+                                }
+                                navController.navigate(NavConstants.RESET_PASSWORD){
+                                    popUpTo(0)
+                                }
                             }
                         }
                     }
@@ -550,6 +565,7 @@ fun LoginViewContent(
                         horizontalArrangement = Arrangement.End
                     ){
                         TextButton(
+                            enabled = authFlowState !is AuthFlowState.Loading,
                             onClick = {
                                 if(email.trim().isEmpty()){
                                     Toast.makeText(context, "Please enter registered email id", Toast.LENGTH_SHORT).show()
@@ -562,11 +578,21 @@ fun LoginViewContent(
                                         }
                                         else {
                                             loginViewModel.getMobileNoByMail(email){
-                                                isMobileNoExist, mobileNumber ->
+                                                isMobileNoExist, mobileNumber, countryCode ->
                                                     Log.d("phoneBook", "mobileNoExist: $isMobileNoExist")
                                                     if(isMobileNoExist){
                                                         mobile = mobileNumber
-                                                        bottomSheetVisibility = true
+                                                        countryNo = countryCode
+                                                        loginViewModel.getOtp(countryNo+mobileNumber, context) {
+                                                            Log.d("OTP_STATE", "Current state: $authFlowState")
+                                                            coroutineScope.launch {
+                                                                Log.d(
+                                                                    "UI timeout",
+                                                                    "LoginPageContent: $it"
+                                                                )
+                                                                loginViewModel.resetAuthFlowState()
+                                                            }
+                                                        }
 //                                                        Toast.makeText(
 //                                                            context,
 //                                                            "OTP sent to $mobileNumber",
@@ -587,15 +613,61 @@ fun LoginViewContent(
                                 }
                             },
                         ) {
-                            Text(
-                                text = "Forget Password ?",
-                                style = TextStyle(
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                    fontWeight = MaterialTheme.typography.headlineLarge.fontWeight,
-                                    fontFamily = overpassMonoBold
-                                )
-                            )
+                            when (val state = authFlowState) {
+                                is AuthFlowState.Error -> {
+                                    coroutineScope.launch {
+                                        Toast.makeText(context, "Please try again", Toast.LENGTH_SHORT)
+                                            .show()
+                                        Log.e("OTP", state.message)
+                                        loginViewModel.resetAuthFlowState()
+                                    }
+                                }
+
+                                AuthFlowState.Idle -> {
+                                    Text(
+                                        text = "Forget Password ?",
+                                        style = TextStyle(
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                            fontWeight = MaterialTheme.typography.headlineLarge.fontWeight,
+                                            fontFamily = overpassMonoBold
+                                        )
+                                    )
+                                }
+
+                                AuthFlowState.Loading -> {
+                                    Text(
+                                        text = "Please wait..",
+                                        style = TextStyle(
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                            fontWeight = MaterialTheme.typography.headlineLarge.fontWeight,
+                                            fontFamily = overpassMonoBold
+                                        )
+                                    )
+                                }
+
+                                is AuthFlowState.MailAndPhoneNumVerified -> TODO()
+                                is AuthFlowState.OtpSent -> {
+                                    Log.d("OtpUiState", "LoginPageContent: $state")
+                                    verificationId = state.verificationId
+                                    Toast.makeText(context, "OTP sent successfully", Toast.LENGTH_SHORT)
+                                        .show()
+                                    bottomSheetVisibility = true
+                                    loginViewModel.resetAuthFlowState()
+                                }
+
+                                is AuthFlowState.OtpTimeout -> {
+                                    Log.d("UI timeout", "LoginPageContent: $state")
+                                    Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                                    loginViewModel.resetAuthFlowState()
+                                }
+
+                                is AuthFlowState.Success -> {
+                                    Log.d("OTP-success", "LoginPageContent: $state")
+                                }
+                            }
+
                         }
                     }
                     OutlinedButton (

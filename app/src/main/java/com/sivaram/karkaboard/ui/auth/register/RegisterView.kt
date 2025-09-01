@@ -206,6 +206,8 @@ fun RegisterViewContent(
 
     val validationState by registerViewModel.validationState.observeAsState()
 
+    val otp by registerViewModel.otp.collectAsState()
+
     val brush = Brush.verticalGradient(
         listOf(
             MaterialTheme.colorScheme.inversePrimary,
@@ -266,7 +268,8 @@ fun RegisterViewContent(
                         )
                     )
                     OtpInput(
-                        otpLength = 6,
+                        otpValues = otp,
+                        onOtpChange = {index, value -> registerViewModel.updateOtp(index, value)},
                         onOtpComplete = {
                             otpText = it
                             Log.d("otpText", otpText)
@@ -343,7 +346,8 @@ fun RegisterViewContent(
                                     profileImgUrl = profileImgUri.toString(),
                                     name = name.trim(),
                                     email = email.trim(),
-                                    mobile = countryCode.trim() + mobileNo.trim(),
+                                    mobile = mobileNo.trim(),
+                                    countryCode = countryCode.trim(),
                                     gender = gender.trim(),
                                     dob = selectedDate?.let {
                                         UtilityFunctions.convertMillisToDate(it)
@@ -1317,6 +1321,7 @@ fun RegisterViewContent(
                                 name = name.trim(),
                                 email = email.trim(),
                                 mobile = mobileNo.trim(),
+                                countryCode = countryCode,
                                 gender = gender.trim(),
                                 dob = selectedDate?.let {
                                     UtilityFunctions.convertMillisToDate(it)
@@ -1480,10 +1485,11 @@ fun RegisterViewContent(
 
 @Composable
 fun OtpInput(
-    otpLength: Int = 6,
+    otpValues: List<String>,
+    onOtpChange: (Int, String) -> Unit,
     onOtpComplete: (String) -> Unit = {}
 ) {
-    val otpValues = remember { mutableStateListOf(*Array(otpLength) { "" }) }
+    val otpLength = otpValues.size
     val focusRequesters = remember { List(otpLength) { FocusRequester() } }
     val focusManager = LocalFocusManager.current
 
@@ -1492,7 +1498,8 @@ fun OtpInput(
             .fillMaxWidth()
             .padding(top = 15.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment =
+            Alignment.CenterVertically
     ) {
         otpValues.forEachIndexed { index, value ->
             val requester = focusRequesters[index]
@@ -1509,7 +1516,10 @@ fun OtpInput(
                             val room = otpLength - index
                             val chunk = digitsOnly.take(room)
                             chunk.forEachIndexed { i, ch ->
-                                otpValues[index + i] = ch.toString()
+//                                otpValues.se
+                                onOtpChange(index + i, ch.toString())
+//                                registerViewModel.updateOtp(index + i, ch.toString())
+//                                otpValues[index + i] = ch.toString()
                             }
 
                             val nextIndex = (index + chunk.length).coerceAtMost(otpLength - 1)
@@ -1526,7 +1536,8 @@ fun OtpInput(
                         }
 
                         digitsOnly.length == 1 && digitsOnly != old -> {
-                            otpValues[index] = digitsOnly
+                            onOtpChange(index, digitsOnly)
+//                            otpValues[index] = digitsOnly
 
                             val nextEmpty =
                                 (index + 1 until otpLength).firstOrNull { otpValues[it].isEmpty() }
@@ -1542,7 +1553,8 @@ fun OtpInput(
 
                         // User deleted inside this box (from filled -> empty)
                         digitsOnly.isEmpty() && old.isNotEmpty() -> {
-                            otpValues[index] = ""
+//                            otpValues[index] = ""
+                            onOtpChange(index, "")
                             if (index > 0) {
                                 focusRequesters[index - 1].requestFocus()
                             }
@@ -1576,7 +1588,8 @@ fun OtpInput(
                     .onPreviewKeyEvent { e ->
                         if (e.type == KeyEventType.KeyDown && e.key == Key.Backspace) {
                             if (otpValues[index].isEmpty() && index > 0) {
-                                otpValues[index - 1] = ""
+//                                otpValues[index - 1] = ""
+                                onOtpChange(index - 1, "")
                                 focusRequesters[index - 1].requestFocus()
                                 true
                             } else false

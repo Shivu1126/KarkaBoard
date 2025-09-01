@@ -13,6 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.sivaram.karkaboard.appconstants.DbConstants
 import com.sivaram.karkaboard.appconstants.OtherConstants
 import com.sivaram.karkaboard.data.dto.StudentsData
+import com.sivaram.karkaboard.data.local.ResetPasswordPref
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
@@ -172,25 +173,46 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun getMobileNoByMail(
         email: String,
-        onResult: (Boolean, String) -> Unit
+        onResult: (Boolean, String, String) -> Unit
     ){
         return try {
             if(isEmailAlreadyInUse(email)){
-                val mobileNumber = firestore.collection(DbConstants.USER_TABLE)
+                val userDocs = firestore.collection(DbConstants.USER_TABLE)
                     .whereEqualTo("email", email)
                     .get()
-                    .await().documents[0].get("mobile").toString()
-                Log.d("phoneBook", "emailDocs: mobile no $mobileNumber")
-                onResult(true, mobileNumber)
+                    .await().documents[0]
+                val mobileNumber = userDocs.get("mobile").toString()
+                val countryCode = userDocs.get("countryCode").toString()
+                Log.d("phoneBook", "emailDocs: mobile no: $countryCode $mobileNumber")
+                onResult(true, mobileNumber, countryCode)
             } else {
                 Log.d("phoneBook", "emailDocs: mobile no null")
-                onResult(false, "null")
+                onResult(false, "null", "")
             }
         }
         catch (e: Exception){
             Log.d("phoneBook", e.localizedMessage ?: "Check failed", e)
-            onResult(false, "null")
+            onResult(false, "null","")
         }
+    }
+
+    override suspend fun resetPassword(
+        newPassword: String,
+        context: Context,
+        onResult: (Boolean) -> Unit
+    ) {
+        return try{
+            auth.currentUser?.updatePassword(newPassword)?.await()
+            onResult(true)
+        }
+        catch (e: Exception){
+            onResult(false)
+        }
+    }
+
+    override suspend fun signOut(context: Context) {
+        ResetPasswordPref.setResetInProgress(context, false)
+        auth.signOut()
     }
 
     private suspend fun isEmailAlreadyInUse(email: String): Boolean {
