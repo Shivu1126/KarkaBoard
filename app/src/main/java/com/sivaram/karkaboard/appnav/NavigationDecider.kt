@@ -57,8 +57,8 @@ fun NavigationDecider(navController: NavController, context: Context) {
             }
         }
     }
-    Scaffold(
-        content = {
+//    Scaffold(
+//        content = {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -73,8 +73,8 @@ fun NavigationDecider(navController: NavController, context: Context) {
                     )
                 }
             )
-        }
-    )
+//        }
+//    )
 
 }
 

@@ -90,4 +90,5 @@ dependencies {
     implementation(libs.firebase.appcheck.playintegrity)
 
     implementation (libs.androidx.datastore.preferences)
+    implementation(libs.accompanist.systemuicontroller)
 }

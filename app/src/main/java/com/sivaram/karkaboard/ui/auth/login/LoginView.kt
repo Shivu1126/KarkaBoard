@@ -78,6 +78,7 @@ import com.sivaram.karkaboard.ui.auth.register.ResendOtpTimer
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
+import com.sivaram.karkaboard.ui.base.BaseView
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
 import com.sivaram.karkaboard.ui.theme.overpassMonoBold
 import com.sivaram.karkaboard.ui.theme.overpassMonoMedium
@@ -88,17 +89,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginView(navController: NavController, context: Context, loginViewModel: LoginViewModel = hiltViewModel()){
 
-
-
-    Scaffold(
-        content = {
             LoginViewContent(
                 navController,
                 context,
                 loginViewModel
             )
-        }
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

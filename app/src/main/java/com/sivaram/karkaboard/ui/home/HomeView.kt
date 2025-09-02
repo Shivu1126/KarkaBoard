@@ -21,14 +21,11 @@ import com.sivaram.karkaboard.appconstants.NavConstants
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeView(navController: NavController, context: Context){
-    Scaffold(
-        content = {
+
             HomeViewContent(
                 navController,
                 context
             )
-        }
-    )
 }
 
 @Composable

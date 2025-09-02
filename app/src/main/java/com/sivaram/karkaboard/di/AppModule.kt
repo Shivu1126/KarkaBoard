@@ -1,12 +1,15 @@
 package com.sivaram.karkaboard.di
 
+import android.content.Context
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
 import com.sivaram.karkaboard.data.remote.repo.DatabaseRepositoryImpl
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepositoryImpl
+import com.sivaram.karkaboard.ui.base.NetworkConnectivityService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -21,4 +24,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDatabaseRepository(): DatabaseRepository = DatabaseRepositoryImpl()
+
+    @Provides
+    @Singleton
+    fun provideNetworkService(@ApplicationContext context: Context ): NetworkConnectivityService = NetworkConnectivityService(context)
 }

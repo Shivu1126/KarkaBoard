@@ -121,15 +121,12 @@ fun RegisterView(
     context: Context,
     registerViewModel: RegisterViewModel = hiltViewModel()
 ) {
-    Scaffold(
-        content = {
             RegisterViewContent(
                 navController,
                 context,
                 registerViewModel
             )
-        }
-    )
+
 }
 
 @SuppressLint("CoroutineCreationDuringComposition")
