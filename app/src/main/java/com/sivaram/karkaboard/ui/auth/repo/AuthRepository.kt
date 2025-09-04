@@ -1,7 +1,7 @@
 package com.sivaram.karkaboard.ui.auth.repo
 
 import android.content.Context
-import com.sivaram.karkaboard.data.dto.StudentsData
+import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
@@ -19,7 +19,7 @@ interface AuthRepository {
         otp: String, verificationId: String, mobile: String, email: String, password: String
     ): VerifyState
 
-    suspend fun registerStudentDetails(studentsData: StudentsData, onResult: (Boolean) -> Unit)
+    suspend fun registerStudentDetails(studentsData: UserData, onResult: (Boolean) -> Unit)
     suspend fun login(email: String, password: String): LoginState
     suspend fun getMobileNoByMail(email: String, onResult: (Boolean, String, String) -> Unit)
     suspend fun resetPassword(password: String, context: Context, onResult: (Boolean) -> Unit)

@@ -35,7 +35,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
@@ -68,21 +67,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.sivaram.karkaboard.R
 import com.sivaram.karkaboard.appconstants.NavConstants
-import com.sivaram.karkaboard.data.dto.RolesData
-import com.sivaram.karkaboard.data.dto.StudentsData
 import com.sivaram.karkaboard.data.local.ResetPasswordPref
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeRepo
 import com.sivaram.karkaboard.ui.auth.register.OtpInput
-import com.sivaram.karkaboard.ui.auth.register.ResendOtpTimer
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
-import com.sivaram.karkaboard.ui.base.BaseView
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
 import com.sivaram.karkaboard.ui.theme.overpassMonoBold
 import com.sivaram.karkaboard.ui.theme.overpassMonoMedium
-import com.sivaram.karkaboard.utils.UtilityFunctions
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -642,7 +636,9 @@ fun LoginViewContent(
                                     )
                                 }
 
-                                is AuthFlowState.MailAndPhoneNumVerified -> TODO()
+                                is AuthFlowState.MailAndPhoneNumVerified -> {
+                                    Log.d("OtpUiState", "LoginPageContent: $state")
+                                }
                                 is AuthFlowState.OtpSent -> {
                                     Log.d("OtpUiState", "LoginPageContent: $state")
                                     verificationId = state.verificationId

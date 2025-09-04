@@ -6,15 +6,23 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -24,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,31 +41,47 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sivaram.karkaboard.ui.base.state.ConnectionState
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BaseView(
+    topBar: @Composable (() -> Unit)? = null,
+    darkIcons: Boolean = !isSystemInDarkTheme(),
     content: @Composable (  PaddingValues) -> Unit
 ){
     val baseViewModel: BaseViewModel = hiltViewModel()
     val connectionState by baseViewModel.connectionState.collectAsStateWithLifecycle()
-    val systemUiController = rememberSystemUiController()
 
+    val bgNavColor = MaterialTheme.colorScheme.secondaryContainer
+    val sysUi = rememberSystemUiController()
     SideEffect {
-        systemUiController.setNavigationBarColor(Color.Transparent, darkIcons = true)
+        sysUi.setStatusBarColor(bgNavColor, darkIcons = darkIcons)
+        sysUi.setNavigationBarColor(bgNavColor, darkIcons = darkIcons)
     }
-    Scaffold(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-    ) { padding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding()) {
-            content(padding)
+            .background(MaterialTheme.colorScheme.secondaryContainer) // background goes here
+    ) {
+        Scaffold(
+            topBar = {topBar?.invoke()},
+            modifier = Modifier
+                .fillMaxSize(),
+            containerColor = Color.Transparent,
 
-            // Show bottom banner above nav bar
-            ConnectionBanner(
-                connectionState = connectionState,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()
+            ) {
+                content(padding)
+
+                // Show bottom banner above nav bar
+                ConnectionBanner(
+                    connectionState = connectionState,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
         }
     }
 }

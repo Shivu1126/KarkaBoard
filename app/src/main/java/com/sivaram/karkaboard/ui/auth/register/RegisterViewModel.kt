@@ -1,16 +1,13 @@
 package com.sivaram.karkaboard.ui.auth.register
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sivaram.karkaboard.data.dto.RolesData
-import com.sivaram.karkaboard.data.dto.StudentsData
+import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
@@ -20,12 +17,8 @@ import com.sivaram.karkaboard.ui.auth.utils.AuthUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
@@ -84,13 +77,13 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun registerStudentDetails(studentsData: StudentsData, onResult: (Boolean) -> Unit) {
+    fun registerStudentDetails(studentsData: UserData, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             authRepository.registerStudentDetails(studentsData, onResult)
         }
     }
 
-    fun validateInputs(studentsData: StudentsData, password: String) {
+    fun validateInputs(studentsData: UserData, password: String) {
         Log.d("studentsData", studentsData.toString())
         if (studentsData.profileImgUrl.isEmpty() || studentsData.profileImgUrl == "null") {
             _validationState.value = ValidationState.Error("Please upload a profile picture")

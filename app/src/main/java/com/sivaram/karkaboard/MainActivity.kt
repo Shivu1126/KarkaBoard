@@ -30,6 +30,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         installSplashScreen()
         setTheme(R.style.Theme_KarkaBoard)
         enableEdgeToEdge()
@@ -37,12 +40,10 @@ class MainActivity : ComponentActivity() {
             KarkaBoardTheme {
                 val navController = rememberNavController()
                 val context = LocalContext.current
-                BaseView { innerPadding ->
                     Navigation(
                         navController = navController,
                         context = context
                     )
-                }
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.sivaram.karkaboard.data.dto
 
-data class StudentsData(
+data class UserData(
     val uId: String = "",
     val profileImgUrl: String = "",
     val name: String = "",

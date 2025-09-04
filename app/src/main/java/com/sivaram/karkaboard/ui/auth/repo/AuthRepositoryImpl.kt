@@ -12,7 +12,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sivaram.karkaboard.appconstants.DbConstants
 import com.sivaram.karkaboard.appconstants.OtherConstants
-import com.sivaram.karkaboard.data.dto.StudentsData
+import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.local.ResetPasswordPref
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
@@ -137,7 +137,7 @@ class AuthRepositoryImpl : AuthRepository {
     }
 
     override suspend fun registerStudentDetails(
-        studentsData: StudentsData,
+        studentsData: UserData,
         onResult: (Boolean) -> Unit
     ) {
         firestore.collection(DbConstants.USER_TABLE).add(studentsData)

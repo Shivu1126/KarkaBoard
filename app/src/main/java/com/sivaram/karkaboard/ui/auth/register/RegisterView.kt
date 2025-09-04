@@ -3,12 +3,10 @@ package com.sivaram.karkaboard.ui.auth.register
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,7 +42,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
@@ -93,7 +90,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -106,7 +102,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.sivaram.karkaboard.data.dto.StudentsData
+import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeRepo
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
@@ -338,7 +334,7 @@ fun RegisterViewContent(
 
                             is VerifyState.Success -> {
                                 Log.d("verify-success", state.message)
-                                val student = StudentsData(
+                                val student = UserData(
                                     uId = state.userUid.toString(),
                                     profileImgUrl = profileImgUri.toString(),
                                     name = name.trim(),
@@ -1312,7 +1308,7 @@ fun RegisterViewContent(
                     OutlinedButton(
                         enabled = authFlowState !is AuthFlowState.Loading,
                         onClick = {
-                            val student = StudentsData(
+                            val student = UserData(
                                 uId = "",
                                 profileImgUrl = profileImgUri.toString(),
                                 name = name.trim(),
@@ -1415,7 +1411,9 @@ fun RegisterViewContent(
                                 )
                             }
 
-                            is AuthFlowState.MailAndPhoneNumVerified -> TODO()
+                            is AuthFlowState.MailAndPhoneNumVerified -> {
+                                Log.d("OtpUiState", "RegisterPageContent: $state")
+                            }
                             is AuthFlowState.OtpSent -> {
                                 Log.d("OtpUiState", "RegisterPageContent: $state")
                                 verificationId = state.verificationId

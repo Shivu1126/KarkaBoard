@@ -1,7 +1,7 @@
 package com.sivaram.karkaboard.ui.auth.fake
 
 import android.content.Context
-import com.sivaram.karkaboard.data.dto.StudentsData
+import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
@@ -14,7 +14,7 @@ class FakeRepo : AuthRepository {
         mobileNumber: String,
         onResult: (Boolean, String) -> Unit
     ) {
-        TODO("Not yet implemented")
+        onResult(true, "")
     }
 
     override suspend fun getOtp(
@@ -22,7 +22,7 @@ class FakeRepo : AuthRepository {
         context: Context,
         onTimeOut: (AuthFlowState.OtpTimeout) -> Unit
     ): AuthFlowState {
-        TODO("Not yet implemented")
+        return AuthFlowState.Idle
     }
 
     override suspend fun verifyPhoneCredential(
@@ -32,25 +32,25 @@ class FakeRepo : AuthRepository {
         email: String,
         password: String
     ): VerifyState {
-        TODO("Not yet implemented")
+        return VerifyState.Idle
     }
 
     override suspend fun registerStudentDetails(
-        studentsData: StudentsData,
+        studentsData: UserData,
         onResult: (Boolean) -> Unit
     ) {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun login(
         email: String,
         password: String
     ): LoginState {
-        TODO("Not yet implemented")
+        return LoginState.Idle
     }
 
     override suspend fun getMobileNoByMail(email: String, onResult: (Boolean, String, String) -> Unit) {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun resetPassword(
@@ -58,11 +58,11 @@ class FakeRepo : AuthRepository {
         context: Context,
         onResult: (Boolean) -> Unit
     ) {
-        TODO("Not yet implemented")
+
     }
 
     override suspend fun signOut(context: Context) {
-        TODO("Not yet implemented")
+
     }
 
 }

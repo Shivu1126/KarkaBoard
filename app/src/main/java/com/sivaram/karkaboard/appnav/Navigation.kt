@@ -10,24 +10,41 @@ import com.sivaram.karkaboard.ui.auth.forgetpassword.ResetPasswordView
 import com.sivaram.karkaboard.ui.home.HomeView
 import com.sivaram.karkaboard.ui.auth.login.LoginView
 import com.sivaram.karkaboard.ui.auth.register.RegisterView
+import com.sivaram.karkaboard.ui.base.BaseView
 
 @Composable
 fun Navigation( navController: NavHostController, context: Context){
     NavHost(navController = navController, startDestination = NavConstants.DECIDER){
         composable(NavConstants.DECIDER){
-            NavigationDecider(navController, context)
+            BaseView(
+                topBar = null
+            ) { innerPadding ->
+                NavigationDecider(navController, context)
+            }
         }
         composable(NavConstants.HOME){
             HomeView(navController, context)
         }
         composable(NavConstants.LOGIN){
-            LoginView(navController, context)
+            BaseView(
+                topBar = null
+            ) { innerPadding ->
+                LoginView(navController, context)
+            }
         }
         composable(NavConstants.REGISTER){
-            RegisterView(navController, context)
+            BaseView(
+                topBar = null
+            ) { innerPadding ->
+                RegisterView(navController, context)
+            }
         }
         composable(NavConstants.RESET_PASSWORD){
-            ResetPasswordView(navController,context)
+            BaseView(
+                topBar = null
+            ) { innerPadding ->
+                ResetPasswordView(navController, context)
+            }
         }
     }
 }
