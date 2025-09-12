@@ -2,6 +2,7 @@ package com.sivaram.karkaboard.appnav
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,6 +12,9 @@ import com.sivaram.karkaboard.ui.home.HomeView
 import com.sivaram.karkaboard.ui.auth.login.LoginView
 import com.sivaram.karkaboard.ui.auth.register.RegisterView
 import com.sivaram.karkaboard.ui.base.BaseView
+import com.sivaram.karkaboard.ui.base.BaseViewModel
+import com.sivaram.karkaboard.ui.managestaffs.ManageStaffsView
+import com.sivaram.karkaboard.ui.managestaffs.addstaff.AddStaffView
 
 @Composable
 fun Navigation( navController: NavHostController, context: Context){
@@ -18,7 +22,7 @@ fun Navigation( navController: NavHostController, context: Context){
         composable(NavConstants.DECIDER){
             BaseView(
                 topBar = null
-            ) { innerPadding ->
+            ) { innerPadding, userData ->
                 NavigationDecider(navController, context)
             }
         }
@@ -28,23 +32,29 @@ fun Navigation( navController: NavHostController, context: Context){
         composable(NavConstants.LOGIN){
             BaseView(
                 topBar = null
-            ) { innerPadding ->
+            ) { innerPadding, userData ->
                 LoginView(navController, context)
             }
         }
         composable(NavConstants.REGISTER){
             BaseView(
-                topBar = null
-            ) { innerPadding ->
+                topBar = null,
+            ) { innerPadding, userData ->
                 RegisterView(navController, context)
             }
         }
         composable(NavConstants.RESET_PASSWORD){
             BaseView(
                 topBar = null
-            ) { innerPadding ->
+            ) { innerPadding, userData ->
                 ResetPasswordView(navController, context)
             }
+        }
+        composable(NavConstants.MANAGE_STAFFS) {
+            ManageStaffsView(navController, context)
+        }
+        composable(NavConstants.ADD_STAFF) {
+            AddStaffView(navController, context)
         }
     }
 }

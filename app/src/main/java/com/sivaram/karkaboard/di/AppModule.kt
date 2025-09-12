@@ -6,6 +6,8 @@ import com.sivaram.karkaboard.data.remote.repo.DatabaseRepositoryImpl
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepositoryImpl
 import com.sivaram.karkaboard.ui.base.NetworkConnectivityService
+import com.sivaram.karkaboard.ui.managestaffs.repo.ManageStaffRepo
+import com.sivaram.karkaboard.ui.managestaffs.repo.ManageStaffRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,4 +30,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideNetworkService(@ApplicationContext context: Context ): NetworkConnectivityService = NetworkConnectivityService(context)
+
+    @Provides
+    @Singleton
+    fun provideManageStaffRepo(): ManageStaffRepo = ManageStaffRepoImpl()
 }

@@ -4,6 +4,9 @@ import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.provider.OpenableColumns
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import java.util.Date
 import java.util.Locale
 
@@ -20,8 +23,14 @@ object UtilityFunctions {
         cursor?.close()
         return name
     }
-    fun isEndWithRole(email: String): Boolean {
-
-        return false
+    @Composable
+    fun getGradient(): Brush {
+        val brush = Brush.verticalGradient(
+            listOf(
+                MaterialTheme.colorScheme.inversePrimary,
+                MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+        )
+        return brush
     }
 }

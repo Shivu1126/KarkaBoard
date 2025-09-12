@@ -44,14 +44,15 @@ class DatabaseRepositoryImpl: DatabaseRepository  {
                     }
                     if (snapshot != null) {
                         val tempList = snapshot.documents.mapNotNull { it.toObject(UserData::class.java) }
-                        userData.value = tempList[0]
+                        if(tempList.isNotEmpty())
+                            userData.value = tempList[0]
                     }
                 }
         }
         catch (e: Exception) {
             userData.value = null
         }
-        Log.d("LogData", "Data -> ${userData.value}")
+        Log.d("LogData", "UserData -> ${userData.value}")
         return userData
     }
 

@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.base.state.ConnectionState
 import kotlinx.coroutines.delay
 
@@ -46,7 +48,7 @@ import kotlinx.coroutines.delay
 fun BaseView(
     topBar: @Composable (() -> Unit)? = null,
     darkIcons: Boolean = !isSystemInDarkTheme(),
-    content: @Composable (  PaddingValues) -> Unit
+    content: @Composable (  PaddingValues, user: UserData?) -> Unit
 ){
     val baseViewModel: BaseViewModel = hiltViewModel()
     val connectionState by baseViewModel.connectionState.collectAsStateWithLifecycle()
@@ -57,24 +59,29 @@ fun BaseView(
         sysUi.setStatusBarColor(bgNavColor, darkIcons = darkIcons)
         sysUi.setNavigationBarColor(bgNavColor, darkIcons = darkIcons)
     }
+    val user by baseViewModel.userData.observeAsState()
+
+    LaunchedEffect(true) {
+            baseViewModel.loadUser()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.secondaryContainer) // background goes here
+            .background(MaterialTheme.colorScheme.secondaryContainer)
     ) {
         Scaffold(
             topBar = {topBar?.invoke()},
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .navigationBarsPadding(),
             containerColor = Color.Transparent,
-
         ) { padding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .navigationBarsPadding()
             ) {
-                content(padding)
+                content(padding, user)
 
                 // Show bottom banner above nav bar
                 ConnectionBanner(
@@ -127,7 +134,6 @@ fun ConnectionBanner(
         exit = slideOutVertically { it } + fadeOut(),
         modifier = modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
     ) {
         val bgColor = when (connectionState) {
             is ConnectionState.Connected -> Color(0xFF4CAF50)

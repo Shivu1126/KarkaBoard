@@ -5,6 +5,7 @@ import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
+import com.sivaram.karkaboard.ui.auth.state.LogoutState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
 
 
@@ -61,8 +62,8 @@ class FakeRepo : AuthRepository {
 
     }
 
-    override suspend fun signOut(context: Context) {
-
+    override suspend fun signOut(context: Context): LogoutState {
+        return LogoutState.Idle
     }
 
 }

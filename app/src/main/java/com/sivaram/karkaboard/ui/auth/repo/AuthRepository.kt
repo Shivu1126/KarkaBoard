@@ -4,6 +4,7 @@ import android.content.Context
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
+import com.sivaram.karkaboard.ui.auth.state.LogoutState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
 
 interface AuthRepository {
@@ -23,5 +24,5 @@ interface AuthRepository {
     suspend fun login(email: String, password: String): LoginState
     suspend fun getMobileNoByMail(email: String, onResult: (Boolean, String, String) -> Unit)
     suspend fun resetPassword(password: String, context: Context, onResult: (Boolean) -> Unit)
-    suspend fun signOut(context: Context)
+    suspend fun signOut(context: Context): LogoutState
 }

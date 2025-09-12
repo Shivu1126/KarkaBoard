@@ -1,7 +1,7 @@
 package com.sivaram.karkaboard.data.dto
 
 data class UserData(
-    val uId: String = "",
+    var uId: String = "",
     val profileImgUrl: String = "",
     val name: String = "",
     val email: String = "",

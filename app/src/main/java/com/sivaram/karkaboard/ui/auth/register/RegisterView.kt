@@ -103,6 +103,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sivaram.karkaboard.data.dto.UserData
+import com.sivaram.karkaboard.data.local.RolePrefs
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeRepo
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
@@ -279,7 +280,7 @@ fun RegisterViewContent(
                         enabled = verifyState !is VerifyState.Loading,
                         onClick = {
                             registerViewModel.verifyPhoneCredential(
-                                otpText,
+                                otp.joinToString(separator = ""),
                                 verificationId,
                                 countryCode + mobileNo,
                                 email,
@@ -360,8 +361,11 @@ fun RegisterViewContent(
                                             "Register Successfully Completed",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        navController.navigate(NavConstants.HOME) {
-                                            popUpTo(0)
+                                        coroutineScope.launch {
+                                            RolePrefs.saveRole(context, "Student")
+                                            navController.navigate(NavConstants.HOME) {
+                                                popUpTo(0)
+                                            }
                                         }
                                     } else {
                                         Toast.makeText(
@@ -712,7 +716,10 @@ fun RegisterViewContent(
                                     contentDescription = "Phone Icon"
                                 )
                                 Box(
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier.fillMaxWidth()
+                                        .clickable{
+                                            countryCodeDropDown = !countryCodeDropDown
+                                        },
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
@@ -846,7 +853,10 @@ fun RegisterViewContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp)
-                                .weight(1f),
+                                .weight(1f)
+                                .clickable{
+                                    genderDropDown = !genderDropDown
+                                },
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -1082,7 +1092,10 @@ fun RegisterViewContent(
                             }
 
                             Row(
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.weight(1f)
+                                    .clickable{
+                                        passedOutYearDropDown = !passedOutYearDropDown
+                                    },
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.End
                             ) {
@@ -1540,7 +1553,7 @@ fun OtpInput(
                                 focusRequesters[nextEmpty].requestFocus()
                             } else {
                                 // no empties left -> complete
-                                if (otpValues.all { it.isNotEmpty() }) {
+                                    if (otpValues.all { it.isNotEmpty() }) {
                                     onOtpComplete(otpValues.joinToString(""))
                                 }
                             }

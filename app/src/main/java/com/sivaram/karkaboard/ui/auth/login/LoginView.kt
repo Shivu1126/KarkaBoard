@@ -68,6 +68,7 @@ import androidx.navigation.compose.rememberNavController
 import com.sivaram.karkaboard.R
 import com.sivaram.karkaboard.appconstants.NavConstants
 import com.sivaram.karkaboard.data.local.ResetPasswordPref
+import com.sivaram.karkaboard.data.local.RolePrefs
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeRepo
 import com.sivaram.karkaboard.ui.auth.register.OtpInput
@@ -200,7 +201,10 @@ fun LoginViewContent(
                     )
                     OtpInput(
                         otpValues = otp,
-                        onOtpChange = {index, value -> loginViewModel.updateOtp(index, value)},
+                        onOtpChange = {index, value ->
+                            loginViewModel.updateOtp(index, value)
+                            Log.d("otp", otp.toString())
+                                      },
                         onOtpComplete = {
                             otpText = it
                             Log.d("otpText", otpText)
@@ -210,7 +214,11 @@ fun LoginViewContent(
                     OutlinedButton(
                         enabled = verifyState !is VerifyState.Loading,
                         onClick = {
-                            loginViewModel.verifyCredential(verificationId, otpText)
+                            Log.d("otpText", otpText)
+                            Log.d("otpFinal",otp.joinToString())
+                            Log.d("verificationId", verificationId)
+
+                            loginViewModel.verifyCredential(verificationId, otp.joinToString(separator = ""))
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -239,7 +247,7 @@ fun LoginViewContent(
 
                             VerifyState.Idle -> {
                                 Text(
-                                    text = "Verify OTP",
+                                    text = "Verify",
                                     style = TextStyle(
                                         fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                                         fontWeight = MaterialTheme.typography.headlineLarge.fontWeight,
@@ -392,7 +400,10 @@ fun LoginViewContent(
                             }
 
                             Row(
-                                modifier = Modifier.weight(5.3f),
+                                modifier = Modifier.weight(5.3f)
+                                    .clickable{
+                                        emailDropDown = !emailDropDown
+                                    },
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.End
                             ) {
@@ -726,10 +737,14 @@ fun LoginViewContent(
                                 )
                             }
                             is LoginState.Success -> {
-                                loginViewModel.resetLoginState()
-                                navController.navigate(NavConstants.HOME) {
-                                    popUpTo(0)
+
+                                coroutineScope.launch {
+                                    RolePrefs.saveRole(context, roleItemData[mailEndIndex].role)
+                                    navController.navigate(NavConstants.HOME) {
+                                        popUpTo(0)
+                                    }
                                 }
+                                loginViewModel.resetLoginState()
                             }
                         }
 

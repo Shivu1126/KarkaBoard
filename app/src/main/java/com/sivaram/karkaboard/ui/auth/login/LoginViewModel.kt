@@ -106,9 +106,11 @@ class LoginViewModel @Inject constructor(
 
     private suspend fun verifyOtp(verificationId: String, otp: String): VerifyState{
         return try{
+            Log.d("verify", "verifyOtp: $verificationId $otp")
             val credential = PhoneAuthProvider.getCredential(verificationId, otp)
             val authResult = auth.signInWithCredential(credential).await()
             val user = authResult.user
+            Log.d("verify", "user: $user")
             if(user != null){
                 VerifyState.Success("Verification successful", user.uid)
             }

@@ -14,8 +14,10 @@ import com.sivaram.karkaboard.appconstants.DbConstants
 import com.sivaram.karkaboard.appconstants.OtherConstants
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.local.ResetPasswordPref
+import com.sivaram.karkaboard.data.local.RolePrefs
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
+import com.sivaram.karkaboard.ui.auth.state.LogoutState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
@@ -210,9 +212,17 @@ class AuthRepositoryImpl : AuthRepository {
         }
     }
 
-    override suspend fun signOut(context: Context) {
-        ResetPasswordPref.setResetInProgress(context, false)
-        auth.signOut()
+    override suspend fun signOut(context: Context): LogoutState {
+
+        return try {
+            auth.signOut()
+            Log.d("phoneBook", "signOut: successfully")
+            LogoutState.Success
+        }
+        catch (e: Exception){
+            Log.d("phoneBook", e.localizedMessage ?: "Check failed", e)
+            LogoutState.Error("Logout failed")
+        }
     }
 
     private suspend fun isEmailAlreadyInUse(email: String): Boolean {
