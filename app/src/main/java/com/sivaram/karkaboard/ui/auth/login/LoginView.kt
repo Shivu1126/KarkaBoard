@@ -101,10 +101,6 @@ fun LoginViewContent(
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
-    var loginButtonEnabled by rememberSaveable { mutableStateOf(true) }
-//    val roleItemDate = listOf(
-//        "I'm Student","@karkaadmin.com","@karkahr.com","@karkafaculty.com","@karkapanelist.com"
-//    )
     var verificationId by rememberSaveable { mutableStateOf("") }
 
     val rolesData by loginViewModel.rolesList.observeAsState()
@@ -773,7 +769,7 @@ fun LoginViewContent(
                                 fontWeight = MaterialTheme.typography.headlineLarge.fontWeight,
                                 fontFamily = overpassMonoBold
                             ),
-                            modifier = Modifier.clickable() {
+                            modifier = Modifier.clickable {
                                 navController.navigate(NavConstants.REGISTER)
                             }
                         )

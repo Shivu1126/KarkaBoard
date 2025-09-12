@@ -7,6 +7,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.sivaram.karkaboard.R
 import com.sivaram.karkaboard.appconstants.DbConstants
 import com.sivaram.karkaboard.appconstants.OtherConstants
+import com.sivaram.karkaboard.data.dto.RolesData
+import com.sivaram.karkaboard.data.dto.StaffData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.managestaffs.state.AddStaffState
 import kotlinx.coroutines.Dispatchers
@@ -23,14 +25,15 @@ class ManageStaffRepoImpl: ManageStaffRepo {
     private val firestore = FirebaseFirestore.getInstance()
 
     override suspend fun createStaff(
-        staffData: UserData,
-        email: String,
+        userData: UserData,
+        personalEmail: String,
+        rolesData: RolesData,
         password: String,
         context: Context
     ): AddStaffState {
         return try{
             Log.d("phoneBook", "currentUser: ${auth.currentUser?.email} ")
-            val jsonObj  = addStaff(staffData, email, password, context)
+            val jsonObj  = addStaff(userData.email, password, context)
             Log.d("phoneBook", "json: $jsonObj")
             Log.d("phoneBook", "currentUser: ${auth.currentUser?.email} ")
             if (jsonObj.has("error")) {
@@ -41,9 +44,18 @@ class ManageStaffRepoImpl: ManageStaffRepo {
                 // Success case
                 val localId = jsonObj.getString("localId")
 
-//                staffData.uId = localId
-
-                AddStaffState.Success("Staff Created Successfully")
+                userData.uId = localId
+                val staffData = StaffData(
+                    name = userData.name,
+                    uId = localId,
+                    email = personalEmail,
+                    companyMail = userData.email,
+                    roleId = rolesData.docId
+                )
+                if(addToDb(userData, staffData))
+                    AddStaffState.Success("Staff Created Successfully")
+                else
+                    AddStaffState.Error("Something went wrong")
             }
         }
         catch (e: Exception){
@@ -53,7 +65,7 @@ class ManageStaffRepoImpl: ManageStaffRepo {
 
     override suspend fun checkStaffExist(
         email: String,
-        domain: String,
+        rolesData: RolesData,
         onResult: (String, Boolean) -> Unit
     ) {
         return try{
@@ -64,9 +76,18 @@ class ManageStaffRepoImpl: ManageStaffRepo {
             if (!emailDocs.isEmpty) {
                 onResult("Staff found", false)
             } else {
-                val newEmail = email.split("@")[0]+"@"+domain+".com"
+                val newEmail = email.split("@")[0]+rolesData.content
                 Log.d("phoneBook", "newEmail: $newEmail")
-                onResult(newEmail,true)
+                val staffDocs = firestore.collection(DbConstants.STAFF_TABLE)
+                    .whereEqualTo("companyMail", newEmail)
+                    .get()
+                    .await()
+                if(staffDocs.isEmpty){
+                    onResult(newEmail,true)
+                }
+                else{
+                    onResult("Staff found", false)
+                }
             }
         }
         catch (e: Exception){
@@ -75,7 +96,6 @@ class ManageStaffRepoImpl: ManageStaffRepo {
     }
 
     private suspend fun addStaff(
-        staffData: UserData,
         email: String,
         password: String,
         context: Context
@@ -85,7 +105,6 @@ class ManageStaffRepoImpl: ManageStaffRepo {
         val payload = JSONObject().apply{
             put("email", email)
             put("password", password)
-            put("phoneNumber", staffData.countryCode+staffData.mobile)
             put("returnSecureToken", false)
         }.toString()
 
@@ -96,6 +115,17 @@ class ManageStaffRepoImpl: ManageStaffRepo {
             val respText = response.body?.string().orEmpty()
             Log.d("httpCall", "addStaff: $respText")
             JSONObject(respText)
+        }
+    }
+
+    private suspend fun addToDb(userData: UserData, staffData: StaffData): Boolean{
+        return try {
+            val userDoc = firestore.collection(DbConstants.USER_TABLE).add(userData).await()
+            val staffDoc = firestore.collection(DbConstants.STAFF_TABLE).add(staffData).await()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 }

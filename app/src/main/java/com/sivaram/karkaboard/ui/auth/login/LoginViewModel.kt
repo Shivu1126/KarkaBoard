@@ -38,8 +38,6 @@ class LoginViewModel @Inject constructor(
     private val _otp = MutableStateFlow(List(6) { "" }) // 6 boxes
     val otp: StateFlow<List<String>> = _otp
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
     private val _authFlowState = MutableStateFlow<AuthFlowState>(AuthFlowState.Idle)
     val authFlowState: StateFlow<AuthFlowState> = _authFlowState
 
@@ -108,7 +106,7 @@ class LoginViewModel @Inject constructor(
         return try{
             Log.d("verify", "verifyOtp: $verificationId $otp")
             val credential = PhoneAuthProvider.getCredential(verificationId, otp)
-            val authResult = auth.signInWithCredential(credential).await()
+            val authResult = authRepository.getAuth().signInWithCredential(credential).await()
             val user = authResult.user
             Log.d("verify", "user: $user")
             if(user != null){

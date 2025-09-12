@@ -1,6 +1,7 @@
 package com.sivaram.karkaboard.ui.auth.repo
 
 import android.content.Context
+import com.google.firebase.auth.FirebaseAuth
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
@@ -25,4 +26,5 @@ interface AuthRepository {
     suspend fun getMobileNoByMail(email: String, onResult: (Boolean, String, String) -> Unit)
     suspend fun resetPassword(password: String, context: Context, onResult: (Boolean) -> Unit)
     suspend fun signOut(context: Context): LogoutState
+    suspend fun getAuth(): FirebaseAuth
 }

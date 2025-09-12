@@ -225,6 +225,10 @@ class AuthRepositoryImpl : AuthRepository {
         }
     }
 
+    override suspend fun getAuth(): FirebaseAuth {
+        return auth
+    }
+
     private suspend fun isEmailAlreadyInUse(email: String): Boolean {
         val emailDocs = firestore.collection(DbConstants.USER_TABLE)
             .whereEqualTo("email", email)

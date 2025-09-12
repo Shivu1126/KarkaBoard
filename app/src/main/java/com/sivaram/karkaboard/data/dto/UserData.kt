@@ -12,5 +12,6 @@ data class UserData(
     val collegeName: String = "",
     val degree: String = "",
     val passingYear: Int = 0,
-    val resumeUrl: String = ""
+    val resumeUrl: String = "",
+    val isProfileCompleted: Boolean = false
 )

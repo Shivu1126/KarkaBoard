@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,17 +17,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,10 +34,11 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,7 +53,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,7 +61,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.sivaram.karkaboard.R
 import com.sivaram.karkaboard.data.dto.UserData
+import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeManageStaffRepo
+import com.sivaram.karkaboard.ui.auth.state.ValidationState
 import com.sivaram.karkaboard.ui.base.BaseView
 import com.sivaram.karkaboard.ui.managestaffs.state.AddStaffState
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
@@ -138,6 +135,7 @@ fun AddStaffView(
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun AddStaffViewContent(navController: NavController, context: Context, addStaffViewModel: AddStaffViewModel) {
 
@@ -150,15 +148,20 @@ fun AddStaffViewContent(navController: NavController, context: Context, addStaff
 //    var countryCodeDropDown by rememberSaveable { mutableStateOf(false) }
 //
 //    var mobileNo by rememberSaveable { mutableStateOf("") }
-
-    val roleRadioOptions = listOf("Interview Panelist", "HR", "Faculty", "Admin")
-    val roleDomainData = listOf("panelist","hr","faculty","admin")
-    var selectedRole by rememberSaveable { mutableStateOf(roleRadioOptions[0]) }
-    var selectedIndex by rememberSaveable { mutableIntStateOf(0)}
+    val rolesData by addStaffViewModel.rolesList.observeAsState()
+    LaunchedEffect(true) {
+        Log.d("AddStaffViewContent", "LaunchedEffect triggered")
+        addStaffViewModel.getRolesList()
+    }
+    val roleItemData = rolesData ?: emptyList()
+    var selectedIndex by rememberSaveable { mutableIntStateOf(1)}
 
     val addStaffState by addStaffViewModel.addStaffState.collectAsState()
     var staffName by rememberSaveable { mutableStateOf("") }
 
+    val validationState by addStaffViewModel.validationState.observeAsState()
+
+    val coroutineScope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -335,64 +338,75 @@ fun AddStaffViewContent(navController: NavController, context: Context, addStaff
                             .padding(0.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ){
-                        roleRadioOptions.forEach { role ->
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .selectable(
-                                        selected = (role == selectedRole),
-                                        onClick = {
-                                            selectedRole = role
-                                            selectedIndex = roleRadioOptions.indexOf(role)
-                                            Log.d(
-                                                "selectedDomain",
-                                                "@karka" + roleDomainData[selectedIndex]
-                                            )
-                                        },
-                                        role = Role.RadioButton
-                                    ),
-                                verticalAlignment = Alignment.CenterVertically
+                        roleItemData.forEach { roleData ->
+                            if(roleData!=roleItemData[0]) {
+                                Row(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .selectable(
+                                            selected = (roleData == roleItemData[selectedIndex]),
+                                            onClick = {
+                                                selectedIndex = roleItemData.indexOf(roleData)
+                                                Log.d(
+                                                    "selectedDomain",
+                                                    roleItemData[selectedIndex].content
+                                                )
+                                            },
+                                            role = Role.RadioButton
+                                        ),
+                                    verticalAlignment = Alignment.CenterVertically
 
-                            ) {
-                                RadioButton(
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        unselectedColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ),
-                                    selected = (role == selectedRole),
-                                    onClick = null
-                                )
-                                Text(
-                                    text = role,
-                                    style = TextStyle(
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
-                                        fontFamily = overpassMonoMedium
-                                    ),
-                                    modifier = Modifier.padding(start = 10.dp)
-                                )
+                                ) {
+                                    RadioButton(
+                                        colors = RadioButtonDefaults.colors(
+                                            selectedColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            unselectedColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                        ),
+                                        selected = (roleData == roleItemData[selectedIndex]),
+                                        onClick = null
+                                    )
+                                    Text(
+                                        text = roleData.role,
+                                        style = TextStyle(
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                            fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                            fontFamily = overpassMonoMedium
+                                        ),
+                                        modifier = Modifier.padding(start = 10.dp)
+                                    )
+                                }
                             }
                         }
                     }
                     OutlinedButton(
                         enabled = addStaffState !is AddStaffState.Loading,
                         onClick = {
-                            val staffData = UserData(
-                                name = staffName,
-                                email = email,
-                            )
-                            addStaffViewModel.checkStaffExist(email,roleDomainData[selectedIndex]){
-                                staffEmail, isValid ->{
-                                    if(isValid){
-                                        addStaffViewModel.createStaff(staffData,staffEmail,"12345678", context)
-                                    }
-                                    else{
-                                        Toast.makeText(context, "Please enter valid email, Maybe Its already taken", Toast.LENGTH_SHORT).show()
+                            addStaffViewModel.validateInputs(staffName, email)
+                            when(val state = validationState){
+                                is ValidationState.Error -> {
+                                    Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                                    return@OutlinedButton
+                                }
+
+                                ValidationState.Success -> {
+
+                                    addStaffViewModel.checkStaffExist(email,roleItemData[selectedIndex]){
+                                        staffEmail, isValid ->
+                                            if(isValid){
+                                                val userData = UserData(
+                                                    name = staffName,
+                                                    email = staffEmail,
+                                                )
+                                                addStaffViewModel.createStaff(userData,email, roleItemData[selectedIndex],"12345678", context)
+                                            }
+                                            else{
+                                                Toast.makeText(context, "Please enter valid email, Maybe Its already taken", Toast.LENGTH_SHORT).show()
+                                            }
                                     }
                                 }
+                                else -> Unit
                             }
-//                            addStaffViewModel.createStaff(staffData,"sivaram@karka"+roleDomainData[selectedIndex]+".com","12345678", context)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -437,6 +451,9 @@ fun AddStaffViewContent(navController: NavController, context: Context, addStaff
                             is AddStaffState.Success -> {
                                 Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
                                 addStaffViewModel.resetAddStaffState()
+                                coroutineScope.launch {
+                                    navController.popBackStack()
+                                }
                             }
                         }
                     }
@@ -451,7 +468,8 @@ fun AddStaffViewContent(navController: NavController, context: Context, addStaff
 @Composable
 fun AddStaffViewPreview() {
     val fakeManageStaffRepo = FakeManageStaffRepo()
-    val fakeVm = AddStaffViewModel(fakeManageStaffRepo)
+    val fakeDbRepo = FakeDbRepo()
+    val fakeVm = AddStaffViewModel(fakeManageStaffRepo, fakeDbRepo)
     KarkaBoardTheme {
         AddStaffViewContent(
             navController = rememberNavController(),

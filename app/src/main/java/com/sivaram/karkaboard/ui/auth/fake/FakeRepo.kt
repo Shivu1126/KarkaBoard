@@ -1,6 +1,7 @@
 package com.sivaram.karkaboard.ui.auth.fake
 
 import android.content.Context
+import com.google.firebase.auth.FirebaseAuth
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
@@ -64,6 +65,10 @@ class FakeRepo : AuthRepository {
 
     override suspend fun signOut(context: Context): LogoutState {
         return LogoutState.Idle
+    }
+
+    override suspend fun getAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
     }
 
 }

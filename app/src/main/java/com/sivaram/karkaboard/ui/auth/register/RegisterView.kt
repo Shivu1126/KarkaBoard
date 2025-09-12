@@ -350,11 +350,11 @@ fun RegisterViewContent(
                                     degree = degree.trim(),
                                     passingYear = passedOutYear.toInt(),
                                     resumeUrl = resumeUri.toString(),
+                                    isProfileCompleted = true
                                 )
 
                                 registerViewModel.registerStudentDetails(student) {
-                                    registerViewModel.resetVerifyState()
-                                    registerViewModel.resetAuthFlowState()
+
                                     if (it) {
                                         Toast.makeText(
                                             context,
@@ -374,6 +374,8 @@ fun RegisterViewContent(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
+                                    registerViewModel.resetVerifyState()
+                                    registerViewModel.resetAuthFlowState()
                                 }
                             }
                         }
@@ -1438,7 +1440,7 @@ fun RegisterViewContent(
 
                             is AuthFlowState.OtpTimeout -> {
                                 Log.d("UI timeout", "RegisterPageContent: $state")
-                                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
                                 registerViewModel.resetAuthFlowState()
                             }
 
