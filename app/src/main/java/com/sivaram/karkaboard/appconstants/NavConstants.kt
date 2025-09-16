@@ -8,4 +8,6 @@ object NavConstants {
     const val RESET_PASSWORD = "reset_password"
     const val MANAGE_STAFFS = "manage_staffs"
     const val ADD_STAFF = "add_staff"
+    const val STAFF_PROFILE = "staff_profile"
+
 }

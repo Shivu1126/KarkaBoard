@@ -163,6 +163,7 @@ fun HomeViewContent(
     val coroutineScope = rememberCoroutineScope()
     val role = RolePrefs.getRole(context).collectAsState(initial = "Unknown").value
     Log.d("role", role)
+    Log.d("userData", userData.toString())
 
     val logoutState by homeViewModel.logoutState.collectAsState()
 

@@ -108,6 +108,9 @@ fun LoginViewContent(
         Log.d("LoginViewContent", "LaunchedEffect triggered")
         loginViewModel.getRolesList()
     }
+    if(rolesData?.isEmpty() == true){
+
+    }
     val roleItemData = rolesData ?: emptyList()
 
     var mailEnd by rememberSaveable { mutableStateOf("") }

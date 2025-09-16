@@ -63,6 +63,7 @@ fun BaseView(
 
     LaunchedEffect(true) {
             baseViewModel.loadUser()
+
     }
 
     Box(

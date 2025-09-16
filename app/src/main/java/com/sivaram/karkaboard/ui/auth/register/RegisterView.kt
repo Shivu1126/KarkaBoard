@@ -2,6 +2,7 @@ package com.sivaram.karkaboard.ui.auth.register
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -168,7 +169,15 @@ fun RegisterViewContent(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         uri?.let {
-            resumeUri = uri
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
+            resumeUri = it
             resumeFileName = UtilityFunctions.getFileName(context, it) ?: ""
         }
         Log.d("resumeFileName", resumeFileName)
@@ -181,7 +190,16 @@ fun RegisterViewContent(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         uri?.let {
-            profileImgUri = uri
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
+            Log.d("profileImgUri", it.toString())
+            profileImgUri = it
             profileImgName = UtilityFunctions.getFileName(context, it) ?: ""
         }
     }

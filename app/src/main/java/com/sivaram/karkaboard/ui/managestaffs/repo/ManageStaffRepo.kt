@@ -9,4 +9,5 @@ interface ManageStaffRepo {
     suspend fun createStaff(userData: UserData, personalEmail: String,rolesData: RolesData, password: String, context: Context): AddStaffState
     suspend fun checkStaffExist(email: String, rolesData: RolesData, onResult: (String, Boolean) -> Unit)
 //    suspend fun addStaff(staffData: UserData,email: String, password: String, mobile: String): JSONObject
+
 }
