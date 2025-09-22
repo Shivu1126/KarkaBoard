@@ -3,6 +3,7 @@ package com.sivaram.karkaboard.ui.managestaffs.staffprofile
 import android.R.attr.onClick
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -55,10 +56,15 @@ import com.sivaram.karkaboard.utils.UtilityFunctions
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toUri
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
+import com.sivaram.karkaboard.ui.auth.fake.FakeManageStaffRepo
 import com.sivaram.karkaboard.ui.managestaffs.state.RemoveStaffState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,6 +153,7 @@ fun StaffProfileViewContent(
     }
 
     val removeState by staffProfileViewModel.removeStaffState.collectAsState()
+    var bgIcon by rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -202,11 +209,15 @@ fun StaffProfileViewContent(
                                 AsyncImage(
                                     model = staffData?.profileImgUrl?.toUri(),
                                     contentDescription = "Profile Image",
+                                    error = painterResource(R.drawable.ic_user_profile),
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(5.dp)
                                         .clip(CircleShape),
-                                    contentScale = ContentScale.Crop
+                                    contentScale = ContentScale.Crop,
+                                    onError = { bgIcon = true},
+                                    onSuccess = {bgIcon = false},
+                                    colorFilter = if(bgIcon) ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer) else null
                                 )
                             }
                         }
@@ -290,7 +301,11 @@ fun StaffProfileViewContent(
                             )
                         )
                         Text(
-                            text = (staffData?.countryCode ?: "")+(staffData?.mobile?:""),
+                            text = if (staffData?.countryCode.isNullOrBlank() || staffData?.mobile.isNullOrBlank()) {
+                                "Not register yet"
+                            } else {
+                                "${staffData?.countryCode}${staffData?.mobile}"
+                            },
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
@@ -391,8 +406,8 @@ fun StaffProfileViewContent(
 @Preview(showBackground = true)
 @Composable
 fun StaffProfileViewPreview() {
-    val fakeDbRepo = FakeDbRepo()
-    val vm = StaffProfileViewModel(fakeDbRepo)
+    val fakeManageStaffRepo = FakeManageStaffRepo()
+    val vm = StaffProfileViewModel(fakeManageStaffRepo)
     KarkaBoardTheme {
         StaffProfileViewContent(
             staffId = "",

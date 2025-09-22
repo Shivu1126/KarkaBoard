@@ -368,7 +368,8 @@ fun RegisterViewContent(
                                     degree = degree.trim(),
                                     passingYear = passedOutYear.toInt(),
                                     resumeUrl = resumeUri.toString(),
-                                    isProfileCompleted = true
+                                    isProfileCompleted = true,
+                                    isDisable = false
                                 )
 
                                 registerViewModel.registerStudentDetails(student) {

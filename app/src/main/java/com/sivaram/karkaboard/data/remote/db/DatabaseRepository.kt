@@ -9,8 +9,5 @@ import com.sivaram.karkaboard.ui.managestaffs.state.RemoveStaffState
 interface DatabaseRepository {
     fun getRoles(): LiveData<List<RolesData>>
     fun getCurrentUser(): LiveData<UserData?>
-    suspend fun getAllStaff(): LiveData<List<StaffData>>
-    suspend fun getStaffData(uid: String): LiveData<StaffData?>
-    suspend fun getStaffRole(roleId: String?): LiveData<String>
-    suspend fun removeStaff(uid: String): RemoveStaffState
+
 }

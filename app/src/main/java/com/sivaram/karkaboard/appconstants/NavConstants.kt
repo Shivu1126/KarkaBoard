@@ -9,5 +9,6 @@ object NavConstants {
     const val MANAGE_STAFFS = "manage_staffs"
     const val ADD_STAFF = "add_staff"
     const val STAFF_PROFILE = "staff_profile"
-
+    const val CREATE_NEW_BATCH = "create_new_batch"
+    const val MANAGE_BATCHES = "manage_batches"
 }

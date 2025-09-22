@@ -159,13 +159,26 @@ class AuthRepositoryImpl : AuthRepository {
         password: String
     ): LoginState {
         return try{
-            val authResult = auth.signInWithEmailAndPassword(email, password).await()
-            val user = authResult.user
-            if(user != null){
-                LoginState.Success("Login Successful", user.uid)
+
+            val userDocs = firestore.collection(DbConstants.USER_TABLE)
+                .whereEqualTo("email", email).get().await()
+            if(userDocs.isEmpty){
+                return LoginState.Error("Check your MailId and Password")
             }
-            else{
-                LoginState.Error("Check your MailId and Password")
+            else {
+                val userData = userDocs.documents[0].toObject(UserData::class.java)
+                if(userData?.isDisable == true ){
+                    LoginState.Error("Your account is disabled")
+                }
+                else {
+                    val authResult = auth.signInWithEmailAndPassword(email, password).await()
+                    val user = authResult.user
+                    if (user != null) {
+                        LoginState.Success("Login Successful", user.uid)
+                    } else {
+                        LoginState.Error("Check your MailId and Password")
+                    }
+                }
             }
         }
         catch (e: Exception){

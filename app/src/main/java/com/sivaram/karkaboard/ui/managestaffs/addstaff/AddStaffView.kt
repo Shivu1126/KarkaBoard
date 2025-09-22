@@ -141,13 +141,6 @@ fun AddStaffViewContent(navController: NavController, context: Context, addStaff
 
     var email by rememberSaveable { mutableStateOf("") }
 
-    val mobileNoCountryCode = listOf(
-        "+91", "+1", "+123", "+41"
-    )
-//    var countryCode by rememberSaveable { mutableStateOf(mobileNoCountryCode[0]) }
-//    var countryCodeDropDown by rememberSaveable { mutableStateOf(false) }
-//
-//    var mobileNo by rememberSaveable { mutableStateOf("") }
     val rolesData by addStaffViewModel.rolesList.observeAsState()
     LaunchedEffect(true) {
         Log.d("AddStaffViewContent", "LaunchedEffect triggered")
@@ -397,6 +390,7 @@ fun AddStaffViewContent(navController: NavController, context: Context, addStaff
                                                 val userData = UserData(
                                                     name = staffName,
                                                     email = staffEmail,
+                                                    isDisable = false
                                                 )
                                                 addStaffViewModel.createStaff(userData,email, roleItemData[selectedIndex],"12345678", context)
                                             }

@@ -60,7 +60,10 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.Dispatcher
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
@@ -69,6 +72,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import androidx.core.net.toUri
+import com.sivaram.karkaboard.ui.auth.fake.FakeManageStaffRepo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -200,7 +204,9 @@ fun ManageStaffsViewContent(navController: NavController, context: Context, mana
                 ) {
                     Log.d("allStaffData", allStaffData.toString())
                     allStaffData?.forEach {staff ->
+
                         item{
+                            var bgIcon by rememberSaveable { mutableStateOf(false) }
                             OutlinedCard(
                                 modifier = Modifier
                                     .height(100.dp),
@@ -226,6 +232,7 @@ fun ManageStaffsViewContent(navController: NavController, context: Context, mana
                                         ),
                                         shape = CircleShape
                                     ) {
+
                                         if(staff.profileImgUrl.isEmpty()){
                                             Icon(
                                                 modifier = Modifier.fillMaxSize(),
@@ -237,17 +244,18 @@ fun ManageStaffsViewContent(navController: NavController, context: Context, mana
                                         else{
                                             AsyncImage(
                                                 model = staff.profileImgUrl.toUri(),
-                                                contentDescription = "Selected Image",
+                                                contentDescription = "Profile Image",
                                                 modifier = Modifier
                                                     .fillMaxSize()
                                                     .clip(CircleShape),
                                                 contentScale = ContentScale.Crop,
-                                                onError = {
-                                                    Log.d("AsyncImage", "Load failed", it.result.throwable)
-                                                },
-                                                onSuccess = {
-                                                    Log.d("AsyncImage", "Load success")
-                                                }
+                                                error = painterResource(R.drawable.ic_user_profile),
+                                                onError = {bgIcon = true
+                                                          Log.d("load image", "error on loading image")
+                                                          Log.d("load image", it.result.throwable.message.toString())},
+                                                onSuccess = {bgIcon = false
+                                                            Log.d("load image", "image loaded successfully")},
+                                                colorFilter = if(bgIcon) ColorFilter.tint(MaterialTheme.colorScheme.secondaryContainer) else null
                                             )
                                         }
                                     }
@@ -313,8 +321,8 @@ fun ManageStaffsViewContent(navController: NavController, context: Context, mana
 @Preview(showBackground = true)
 @Composable
 fun ManageStaffsViewPreview(){
-    val fakeDbRepo = FakeDbRepo()
-    val fakeVm = ManageStaffsViewModel(fakeDbRepo)
+    val fakeManageStaffRepo = FakeManageStaffRepo()
+    val fakeVm = ManageStaffsViewModel(fakeManageStaffRepo)
     KarkaBoardTheme {
         ManageStaffsViewContent(
             navController = rememberNavController(),

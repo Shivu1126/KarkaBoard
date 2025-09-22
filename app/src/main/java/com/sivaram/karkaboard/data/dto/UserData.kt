@@ -2,16 +2,17 @@ package com.sivaram.karkaboard.data.dto
 
 data class UserData(
     var uId: String = "",
-    val profileImgUrl: String = "",
-    val name: String = "",
-    val email: String = "",
-    val mobile: String = "",
-    val countryCode: String = "",
-    val gender: String = "",
-    val dob: String = "",
-    val collegeName: String = "",
-    val degree: String = "",
-    val passingYear: Int = 0,
-    val resumeUrl: String = "",
-    val isProfileCompleted: Boolean = false
+    var profileImgUrl: String = "",
+    var name: String = "",
+    var email: String = "",
+    var mobile: String = "",
+    var countryCode: String = "",
+    var gender: String = "",
+    var dob: String = "",
+    var collegeName: String = "",
+    var degree: String = "",
+    var passingYear: Int = 0,
+    var resumeUrl: String = "",
+    var isProfileCompleted: Boolean = false,
+    var isDisable: Boolean = false
 )
