@@ -7,12 +7,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.sivaram.karkaboard.appconstants.DbConstants
+import com.sivaram.karkaboard.data.dto.ApplicationPortalData
+import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.RolesData
-import com.sivaram.karkaboard.data.dto.StaffData
+import com.sivaram.karkaboard.data.dto.StudentsData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
-import com.sivaram.karkaboard.ui.managestaffs.state.RemoveStaffState
-import kotlinx.coroutines.tasks.await
 
 class DatabaseRepositoryImpl: DatabaseRepository  {
     private val firebaseFireStore = FirebaseFirestore.getInstance()
@@ -62,4 +62,86 @@ class DatabaseRepositoryImpl: DatabaseRepository  {
         Log.d("LogData", "UserData -> ${userData.value}")
         return userData
     }
+
+    override suspend fun getAllBatches(): LiveData<List<BatchData>> {
+        val allBatchesData = MutableLiveData<List<BatchData>>(emptyList())
+        try {
+            firebaseFireStore.collection(DbConstants.BATCHES_TABLE)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val batchList =
+                            snapshot.documents.mapNotNull { it.toObject(BatchData::class.java) }
+                        Log.d("ManageBatchesRepoImpl", "getAllBatches: $batchList")
+                        allBatchesData.value = batchList
+                    }
+                }
+        }catch (e: Exception) {
+            allBatchesData.value = emptyList()
+        }
+        return allBatchesData
+    }
+
+    override suspend fun getStudentData(uid: String): LiveData<StudentsData?> {
+        val stuData = MutableLiveData<StudentsData?>()
+        Log.d("LogData","getStudentData() -> $uid")
+        try{
+            firebaseFireStore.collection(DbConstants.STUDENT_TABLE).whereEqualTo("uid", uid)
+                .addSnapshotListener {
+                    snapshot, error ->
+                    if (error != null) {
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val tempList = snapshot.documents.mapNotNull { it.toObject(StudentsData::class.java) }
+                        Log.d("LogData", "Data -> $tempList")
+                        stuData.value = tempList[0]
+                    }
+                }
+        }catch (e: Exception){
+            stuData.value = null
+        }
+        Log.d("LogData","getStudentData() -> ${stuData.value}")
+        return stuData
+    }
+
+    override suspend fun getApplicationPortalData(studentId: String): LiveData<List<ApplicationPortalData>> {
+        val applicationPortalData = MutableLiveData<List<ApplicationPortalData>>(emptyList())
+        Log.d("LogData","getApplicationPortalData() -> $studentId")
+        try{
+            firebaseFireStore.collection(DbConstants.APPLICATION_TABLE).whereEqualTo("studentId", studentId)
+                .addSnapshotListener {
+                        snapshot, error ->
+                    if (error != null) {
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val appliedBatchId = snapshot.documents.map{it.id}.toSet()
+
+                        firebaseFireStore.collection(DbConstants.BATCHES_TABLE).whereEqualTo("open",true)
+                            .addSnapshotListener {
+                                    batchSnapshot,error ->
+                                if (error != null) {
+                                    return@addSnapshotListener
+                                }
+                                if (batchSnapshot != null) {
+                                    val result = batchSnapshot.documents.map{
+                                        val batchId = it.id
+                                        val isApplied = appliedBatchId.contains(batchId)
+                                        ApplicationPortalData(batchData = it.toObject(BatchData::class.java), isApplied = isApplied)
+                                    }
+                                    applicationPortalData.value = result
+                                }
+                            }
+                    }
+                }
+        }catch (e: Exception){
+            applicationPortalData.value = emptyList()
+        }
+        Log.d("LogData","getApplicationPortalData() -> ${applicationPortalData.value}")
+        return applicationPortalData
+    }
+
 }

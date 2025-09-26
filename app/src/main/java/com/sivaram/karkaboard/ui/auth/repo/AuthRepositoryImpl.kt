@@ -12,6 +12,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sivaram.karkaboard.appconstants.DbConstants
 import com.sivaram.karkaboard.appconstants.OtherConstants
+import com.sivaram.karkaboard.data.dto.StudentsData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.local.ResetPasswordPref
 import com.sivaram.karkaboard.data.local.RolePrefs
@@ -145,7 +146,18 @@ class AuthRepositoryImpl : AuthRepository {
         firestore.collection(DbConstants.USER_TABLE).add(studentsData)
             .addOnSuccessListener {
                 Log.d("phoneBook", "DocumentSnapshot added with ID: ${it.id}")
-                onResult(true)
+                val stu = StudentsData(
+                    uid = studentsData.uId
+                )
+                val stuDocs = firestore.collection(DbConstants.STUDENT_TABLE).document()
+                stu.docId = stuDocs.id
+                stuDocs.set(stu)
+                    .addOnSuccessListener {
+                        onResult(true)
+                    }
+                    .addOnFailureListener {
+                        onResult(false)
+                    }
             }
             .addOnFailureListener {
                 Log.d("phoneBook", "Error adding document", it)

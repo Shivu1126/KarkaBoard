@@ -92,7 +92,8 @@ fun StaffProfileView(
                         text = "Staff Profile",
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                            fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                            fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
+                            fontFamily = overpassMonoBold
                         )
                     )
                 },

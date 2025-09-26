@@ -5,27 +5,21 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
@@ -33,8 +27,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -46,7 +38,6 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -60,10 +51,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -78,10 +67,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
-import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.google.firebase.auth.FirebaseAuth
 import com.sivaram.karkaboard.appconstants.NavConstants
 import com.sivaram.karkaboard.appconstants.OtherConstants
 import com.sivaram.karkaboard.data.dto.UserData
@@ -90,9 +77,9 @@ import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeRepo
 import com.sivaram.karkaboard.ui.auth.state.LogoutState
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
+import com.sivaram.karkaboard.ui.theme.overpassMonoBold
+import com.sivaram.karkaboard.ui.theme.overpassMonoMedium
 import com.sivaram.karkaboard.utils.UtilityFunctions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,7 +128,8 @@ fun HomeView(
                             text = "DashBoard",
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                                fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
+                                fontFamily = overpassMonoBold
                             )
                         )
                     },
@@ -195,6 +183,15 @@ fun HomeViewContent(
     Log.d("role", role)
     Log.d("userData", "home->$userData")
 
+    val studentData by homeViewModel.studentData.observeAsState()
+
+    LaunchedEffect(userData) {
+        if(role == OtherConstants.STUDENT){
+            homeViewModel.getStudentData(userData?.uId.toString())
+            Log.d("studentData", "home -> ${studentData.toString()}")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -244,15 +241,16 @@ fun HomeViewContent(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Icon(
-                                            modifier = Modifier.size(50.dp),
+                                            modifier = Modifier.size(40.dp),
                                             painter = painterResource(R.drawable.ic_manage_staff),
                                             contentDescription = "Manage Staffs"
                                         )
                                         Text(
                                             text = "Manage Staffs",
                                             style = TextStyle(
-                                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                                fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                                fontFamily = overpassMonoBold
                                             ),
                                             textAlign = TextAlign.Center
                                         )
@@ -288,15 +286,16 @@ fun HomeViewContent(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Icon(
-                                            modifier = Modifier.size(50.dp),
+                                            modifier = Modifier.size(40.dp),
                                             painter = painterResource(R.drawable.ic_create_batch),
                                             contentDescription = "Batch"
                                         )
                                         Text(
                                             text = "All Batch",
                                             style = TextStyle(
-                                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                                fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                                fontFamily = overpassMonoBold
                                             ),
                                             textAlign = TextAlign.Center
                                         )
@@ -329,6 +328,11 @@ fun HomeViewContent(
                                         horizontalAlignment = Alignment.CenterHorizontally,
 
                                         ) {
+                                        Icon(
+                                            modifier = Modifier.size(40.dp),
+                                            painter = painterResource(R.drawable.ic_students),
+                                            contentDescription = "Students"
+                                        )
                                         Text(
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -337,8 +341,9 @@ fun HomeViewContent(
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis,
                                             style = TextStyle(
-                                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                                fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                                fontFamily = overpassMonoBold
                                             ),
                                             textAlign = TextAlign.Center
                                         )
@@ -346,7 +351,7 @@ fun HomeViewContent(
                                 }
                             }
                         }
-                        if(role==OtherConstants.STUDENT){
+                        if(role==OtherConstants.STUDENT && studentData?.isSelected!=true ){
                             item {
                                 OutlinedCard(
                                     modifier = Modifier
@@ -364,7 +369,7 @@ fun HomeViewContent(
                                     ),
                                     shape = RoundedCornerShape(25.dp),
                                     onClick = {
-
+                                        navController.navigate(NavConstants.APPLICATION_PORTAL)
                                     }
                                 ) {
                                     Column(
@@ -373,16 +378,22 @@ fun HomeViewContent(
                                         horizontalAlignment = Alignment.CenterHorizontally,
 
                                         ) {
+                                        Icon(
+                                            modifier = Modifier.size(40.dp),
+                                            painter = painterResource(R.drawable.ic_portal),
+                                            contentDescription = "Portal"
+                                        )
                                         Text(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(5.dp),
-                                            text = "Application",
+                                            text = "Application Portal",
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis,
                                             style = TextStyle(
-                                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                                fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                                fontFamily = overpassMonoBold
                                             ),
                                             textAlign = TextAlign.Center
                                         )
@@ -480,7 +491,8 @@ fun DrawerContent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = TextStyle(
                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                        fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                        fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
+                        fontFamily = overpassMonoBold
                     )
                 )
                 Text(
@@ -490,7 +502,8 @@ fun DrawerContent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = TextStyle(
                         fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                        fontWeight = MaterialTheme.typography.titleSmall.fontWeight
+                        fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
+                        fontFamily = overpassMonoMedium
                     )
                 )
             }
@@ -515,7 +528,8 @@ fun DrawerContent(
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                            fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+                            fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                            fontFamily = overpassMonoBold
                         )
                     )
                 },
@@ -542,7 +556,8 @@ fun DrawerContent(
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                            fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+                            fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                            fontFamily = overpassMonoBold
                         )
                     )
                 },
@@ -573,7 +588,8 @@ fun DrawerContent(
                     color = MaterialTheme.colorScheme.error,
                     style = TextStyle(
                         fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+                        fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                        fontFamily = overpassMonoBold
                     )
                 )
             },
@@ -614,8 +630,10 @@ fun DrawerContent(
 @Composable
 fun HomeViewPreview() {
     val fakeRepo = FakeRepo()
+    val fakeDbRepo = FakeDbRepo()
     val fakeVm = HomeViewModel(
-        authRepository = fakeRepo
+        authRepository = fakeRepo,
+        databaseRepository = fakeDbRepo
     )
     KarkaBoardTheme {
         HomeViewContent(

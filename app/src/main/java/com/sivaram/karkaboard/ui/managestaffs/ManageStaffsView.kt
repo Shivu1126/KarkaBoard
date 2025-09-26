@@ -287,26 +287,6 @@ fun ManageStaffsViewContent(navController: NavController, context: Context, mana
                                             overflow = TextOverflow.Ellipsis
                                         )
                                     }
-//                                    Box(
-//                                        modifier = Modifier.size(30.dp)
-//                                    ) {
-//                                        IconButton(
-//                                            modifier = Modifier.size(30.dp),
-//                                            colors = IconButtonDefaults.iconButtonColors(
-//                                                containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-//                                                contentColor = MaterialTheme.colorScheme.secondaryContainer
-//                                            ),
-//                                            onClick = {
-//
-//                                            }
-//                                        ) {
-//                                            Icon(
-//                                                modifier = Modifier.size(30.dp),
-//                                                painter = painterResource(R.drawable.ic_menu),
-//                                                contentDescription = "Edit"
-//                                            )
-//                                        }
-//                                    }
                                 }
                             }
                         }

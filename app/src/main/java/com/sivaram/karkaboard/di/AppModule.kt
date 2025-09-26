@@ -6,6 +6,8 @@ import com.sivaram.karkaboard.data.remote.repo.DatabaseRepositoryImpl
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepositoryImpl
 import com.sivaram.karkaboard.ui.base.NetworkConnectivityService
+import com.sivaram.karkaboard.ui.managebatches.repo.ManageBatchesRepo
+import com.sivaram.karkaboard.ui.managebatches.repo.ManageBatchesRepoImpl
 import com.sivaram.karkaboard.ui.managestaffs.repo.ManageStaffRepo
 import com.sivaram.karkaboard.ui.managestaffs.repo.ManageStaffRepoImpl
 import dagger.Module
@@ -34,4 +36,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideManageStaffRepo(): ManageStaffRepo = ManageStaffRepoImpl()
+
+    @Provides
+    @Singleton
+    fun provideManageBatchesRepo(): ManageBatchesRepo = ManageBatchesRepoImpl()
+
 }

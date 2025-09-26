@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.sivaram.karkaboard.appconstants.NavConstants
+import com.sivaram.karkaboard.ui.applicationportal.ApplicationPortalView
 import com.sivaram.karkaboard.ui.auth.forgetpassword.ResetPasswordView
 import com.sivaram.karkaboard.ui.home.HomeView
 import com.sivaram.karkaboard.ui.auth.login.LoginView
@@ -72,6 +73,9 @@ fun Navigation( navController: NavHostController, context: Context){
         }
         composable(NavConstants.MANAGE_BATCHES) {
             ManageBatchesView(navController, context)
+        }
+        composable(NavConstants.APPLICATION_PORTAL) {
+            ApplicationPortalView(navController, context)
         }
     }
 }
