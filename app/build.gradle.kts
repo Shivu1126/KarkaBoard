@@ -93,4 +93,5 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
 
     implementation (libs.lottie.compose)
+    implementation(libs.kotstep.v301)
 }

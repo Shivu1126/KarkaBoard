@@ -3,6 +3,7 @@ package com.sivaram.karkaboard.ui.applicationportal
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,19 +17,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetDefaults.DragHandle
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -50,19 +56,33 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.sivaram.karkaboard.R
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.sivaram.karkaboard.appconstants.OtherConstants
+import com.binayshaw7777.kotstep.model.LineDefault
+import com.binayshaw7777.kotstep.model.LineType
+import com.binayshaw7777.kotstep.model.StepDefaults
+import com.binayshaw7777.kotstep.model.StepStyle
+import com.binayshaw7777.kotstep.model.iconVerticalWithLabel
+import com.binayshaw7777.kotstep.ui.vertical.VerticalStepper
+import com.sivaram.karkaboard.data.dto.BottomSheetParams
 import com.sivaram.karkaboard.data.dto.UserData
+import com.sivaram.karkaboard.ui.applicationportal.state.ApplyState
 import com.sivaram.karkaboard.ui.auth.fake.FakeApplicationPortalRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.base.BaseView
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
 import com.sivaram.karkaboard.ui.theme.overpassMonoBold
 import com.sivaram.karkaboard.ui.theme.overpassMonoMedium
+import com.sivaram.karkaboard.ui.theme.overpassMonoSemiBold
 import com.sivaram.karkaboard.utils.UtilityFunctions
 import kotlinx.coroutines.launch
 
@@ -130,6 +150,7 @@ fun ApplicationPortalView(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApplicationPortalViewContent(
     userData: UserData?,
@@ -144,6 +165,7 @@ fun ApplicationPortalViewContent(
         composition,
         iterations = LottieConstants.IterateForever
     )
+    val applyStates by applicationPortalViewModel.applyState.collectAsState()
 
     LaunchedEffect(userData) {
         Log.d("userData", userData.toString())
@@ -152,6 +174,13 @@ fun ApplicationPortalViewContent(
         }
     }
     Log.d("applicationPortalData", applicationPortalData.toString())
+
+    val coroutineScope = rememberCoroutineScope()
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+    )
+    var bottomSheetParams by remember { mutableStateOf<BottomSheetParams?>(null) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -190,6 +219,7 @@ fun ApplicationPortalViewContent(
                         applicationPortalData?.forEach {data ->
                             val batchData = data.batchData
                             val isApplied = data.isApplied
+                            val state = applyStates[batchData?.docId] ?: ApplyState.Idle
                             item {
                                 OutlinedCard(
                                     modifier = Modifier
@@ -295,7 +325,6 @@ fun ApplicationPortalViewContent(
                                             ),
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            //button to apply
                                             OutlinedButton(
                                                 modifier = Modifier.weight(1f),
                                                 onClick = {
@@ -304,7 +333,11 @@ fun ApplicationPortalViewContent(
                                                 border = BorderStroke(
                                                     1.dp,
                                                     MaterialTheme.colorScheme.onPrimaryContainer
-                                                )
+                                                ),
+                                                colors = ButtonDefaults.outlinedButtonColors(
+                                                    containerColor = MaterialTheme.colorScheme.onSecondary,
+                                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                ),
                                             ) {
                                                 Text(
                                                     textAlign = TextAlign.Center,
@@ -325,9 +358,24 @@ fun ApplicationPortalViewContent(
                                             OutlinedButton(
                                                 modifier = Modifier.weight(1f),
                                                 onClick = {
+                                                    if(isApplied){
+                                                        bottomSheetParams = batchData?.let { batchData
+                                                            userData?.let { studentData ->
+                                                                BottomSheetParams(
+                                                                    batchData, studentData
+                                                                )
+                                                            }
+                                                        }
+                                                    }
+                                                    else{
+                                                        applicationPortalViewModel.applyForTraining(
+                                                            batchData?.docId ?: "",
+                                                            userData?.uId ?: ""
+                                                        )
+                                                    }
                                                 },
                                                 colors = ButtonDefaults.outlinedButtonColors(
-                                                    containerColor = if(isApplied)MaterialTheme.colorScheme.secondary
+                                                    containerColor = if(isApplied)MaterialTheme.colorScheme.onSecondary
                                                                         else MaterialTheme.colorScheme.primaryContainer,
                                                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                                 ),
@@ -336,15 +384,38 @@ fun ApplicationPortalViewContent(
                                                     MaterialTheme.colorScheme.onPrimaryContainer
                                                 )
                                             ) {
-                                                Text(
-                                                    textAlign = TextAlign.Center,
-                                                    text = if(isApplied)"Status" else "Apply",
-                                                    style = TextStyle(
-                                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                                        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
-                                                        fontFamily = overpassMonoBold
-                                                    )
-                                                )
+                                                when(state){
+                                                    is ApplyState.Error -> {
+                                                        Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                                                        applicationPortalViewModel.resetApplyState(
+                                                            batchData?.docId ?: ""
+                                                        )
+                                                    }
+                                                    ApplyState.Idle -> {
+                                                        Text(
+                                                            textAlign = TextAlign.Center,
+                                                            text = if(isApplied)"Status" else "Apply",
+                                                            style = TextStyle(
+                                                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                                                fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                                                fontFamily = overpassMonoBold
+                                                            )
+                                                        )
+                                                    }
+                                                    ApplyState.Loading -> {
+                                                        CircularProgressIndicator(
+                                                            color = MaterialTheme.colorScheme.secondaryContainer,
+                                                            modifier = Modifier.size(25.dp),
+                                                            strokeWidth = 4.dp
+                                                        )
+                                                    }
+                                                    is ApplyState.Success -> {
+                                                        Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                                                        applicationPortalViewModel.resetApplyState(
+                                                            batchData?.docId ?: ""
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -354,6 +425,306 @@ fun ApplicationPortalViewContent(
                     }
                 }
             }
+        }
+    }
+    if(bottomSheetParams!=null){
+        ModalBottomSheet(
+            modifier = Modifier.fillMaxSize(),
+            sheetState = bottomSheetState,
+            onDismissRequest = {
+                bottomSheetParams = null
+            },
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            dragHandle = {
+                DragHandle(
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+        ){
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(
+                    0.dp,
+                    alignment = Alignment.CenterVertically
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                BottomSheetDesign(
+                    bottomSheetParams = bottomSheetParams!!,
+                    applicationPortalViewModel = applicationPortalViewModel
+                )
+            }
+        }
+
+    }
+}
+
+@Composable
+fun BottomSheetDesign(bottomSheetParams: BottomSheetParams, applicationPortalViewModel: ApplicationPortalViewModel){
+    Log.d("bottomSheetParams", bottomSheetParams.toString())
+    val batchData = bottomSheetParams.batchData
+    val studentData = bottomSheetParams.studentData
+
+//    val processState by applicationPortalViewModel.processState.observeAsState()
+//    val appliedDate by applicationPortalViewModel.appliedDate.observeAsState()
+    val applicationData by applicationPortalViewModel.applicationData.observeAsState()
+
+    LaunchedEffect(bottomSheetParams){
+        applicationPortalViewModel.getApplicationData(batchData.docId, studentData.uId)
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(20.dp, alignment = Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            textAlign = TextAlign.Center,
+            text = "Application Status",
+            style = TextStyle(
+                fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                fontWeight = MaterialTheme.typography.headlineLarge.fontWeight,
+                fontFamily = overpassMonoBold
+            )
+        )
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+        )
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Text(
+                    text = batchData.batchName,
+                    style = TextStyle(
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                        fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
+                        fontFamily = overpassMonoBold
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = batchData.designation,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle(
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                        fontFamily = overpassMonoMedium
+                    ),
+                )
+            }
+            Column(
+                modifier = Modifier.padding(start = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Text(
+                    text = "Applied at ${UtilityFunctions.convertMillisToDate(
+                        applicationData?.appliedAt ?: 0
+                    )}",
+                    style = TextStyle(
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                        fontFamily = overpassMonoMedium
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Icon(
+                        modifier = Modifier.size(15.dp),
+                        painter = painterResource(R.drawable.ic_location),
+                        contentDescription = "Location",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        textAlign = TextAlign.End,
+                        text = batchData.interviewLocation,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = TextStyle(
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                            fontFamily = overpassMonoBold
+                        )
+                    )
+                }
+            }
+        }
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+        )
+        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(0.dp)
+        ) {
+            Text(
+                text = "Your Application",
+                style = TextStyle(
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                    fontFamily = overpassMonoSemiBold
+                ),
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            VerticalStepper(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .padding(horizontal = 5.dp),
+                style = iconVerticalWithLabel(
+                    trailingLabels = listOf(
+                        {
+                            Column(modifier = Modifier.padding(top = 7.dp),) {
+                                Text(
+                                    textAlign = TextAlign.Center,
+                                    text = "Applied",
+                                    style = TextStyle(
+                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                        fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
+                                        fontFamily = overpassMonoSemiBold
+                                    )
+                                )
+                            }
+                        },
+                        {
+                            Column(modifier = Modifier.padding(top = 7.dp),) {
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = "Shortlisted",
+                                style = TextStyle(
+                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                    fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
+                                    fontFamily = overpassMonoSemiBold
+                                )
+                            )
+                        }
+                        },
+                        {Column(modifier = Modifier.padding(top = 7.dp),) {
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = "Interview",
+                                style = TextStyle(
+                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                    fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
+                                    fontFamily = overpassMonoSemiBold
+                                )
+                            )
+                        }},
+                        {Column(modifier = Modifier.padding(top = 7.dp),) {
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = "Onboarding",
+                                style = TextStyle(
+                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                    fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
+                                    fontFamily = overpassMonoSemiBold
+                                )
+                            )
+                        }}
+                    ),
+                    totalSteps = 4,
+                    currentStep = applicationData?.processId?.toLong() ?: 0,
+                    icons = listOf(
+                        ImageVector.vectorResource(R.drawable.ic_location),
+                        ImageVector.vectorResource(R.drawable.ic_shortlist),
+                        ImageVector.vectorResource(R.drawable.ic_interview),
+                        ImageVector.vectorResource(R.drawable.ic_onboard)
+                    ),
+                    stepStyle = StepStyle(
+                        colors = StepDefaults(
+                            todoContainerColor = MaterialTheme.colorScheme.onSecondary,
+                            todoContentColor = MaterialTheme.colorScheme.secondary,
+                            todoLineColor = MaterialTheme.colorScheme.onSecondary,
+                            currentContainerColor = MaterialTheme.colorScheme.primary,
+                            currentContentColor = MaterialTheme.colorScheme.primary,
+                            currentLineColor = MaterialTheme.colorScheme.primary,
+                            doneContainerColor = MaterialTheme.colorScheme.primary,
+                            doneContentColor = MaterialTheme.colorScheme.onSecondary,
+                            doneLineColor = MaterialTheme.colorScheme.primary,
+                            checkMarkColor = MaterialTheme.colorScheme.onSecondary
+                        ),
+                        lineStyle = LineDefault(
+                            lineSize = 40.dp,
+                            lineThickness = 5.dp,
+                            linePaddingStart = 5.dp,
+                            linePaddingEnd = 5.dp,
+                            linePaddingTop = 0.dp,
+                            linePaddingBottom = 0.dp,
+                            trackStrokeCap = StrokeCap.Round,
+                            progressStrokeCap = StrokeCap.Round,
+                            currentLineTrackType = LineType.SOLID,
+                        ),
+                        stepSize = 36.dp,
+                        stepShape = CircleShape,
+                        stepStroke = 2f,
+                        iconSize = 24.dp,
+                    ),
+
+                )
+            )
+//            Column(modifier = Modifier.padding(top = 10.dp)
+//                .padding(horizontal = 0.dp)) { StatusIndicator() }
+
+
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ){
+//                Text(
+//                    modifier = Modifier.weight(1f),
+//                    text = "InReview",
+//                    style = TextStyle(
+//                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+//                        fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
+//                        fontFamily = overpassMonoSemiBold
+//                    )
+//                )
+//                Text(
+//                    modifier = Modifier.weight(1f),
+//                    textAlign = TextAlign.Center,
+//                    text = "Shortlisted",
+//                    style = TextStyle(
+//                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+//                        fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
+//                        fontFamily = overpassMonoSemiBold
+//                    )
+//                )
+//                Text(
+//                    modifier = Modifier.weight(1f),
+//                    textAlign = TextAlign.Center,
+//                    text = "Interview",
+//                    style = TextStyle(
+//                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+//                        fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
+//                        fontFamily = overpassMonoSemiBold
+//                    )
+//                )
+//                Text(
+//                    modifier = Modifier.weight(1f),
+//                    textAlign = TextAlign.Center,
+//                    text = "Result",
+//                    style = TextStyle(
+//                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+//                        fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
+//                        fontFamily = overpassMonoSemiBold
+//                    )
+//                )
+//            }
         }
     }
 }

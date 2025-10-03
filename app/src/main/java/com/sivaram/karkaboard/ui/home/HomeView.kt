@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -214,8 +217,8 @@ fun HomeViewContent(
                     horizontalArrangement = Arrangement.spacedBy(25.dp),
                     columns = GridCells.Fixed(2),
                     content = {
-                        if (role == OtherConstants.ADMIN) {
-                            item {
+                        if (role == OtherConstants.ADMIN) {     //admin only
+                            item {  //Manage staffs
                                 OutlinedCard(
                                     modifier = Modifier
                                         .aspectRatio(1f), // makes width == height,
@@ -259,8 +262,8 @@ fun HomeViewContent(
                             }
 
                         }
-                        if(role!=OtherConstants.STUDENT){
-                            item {
+                        if(role!=OtherConstants.STUDENT){   //all except students
+                            item {//all batch
                                 OutlinedCard(
                                     modifier = Modifier
                                         .aspectRatio(1f), // makes width == height,
@@ -302,7 +305,7 @@ fun HomeViewContent(
                                     }
                                 }
                             }
-                            item {
+                            item {//All student
                                 OutlinedCard(
                                     modifier = Modifier
                                         .aspectRatio(1f),
@@ -352,7 +355,7 @@ fun HomeViewContent(
                             }
                         }
                         if(role==OtherConstants.STUDENT && studentData?.isSelected!=true ){
-                            item {
+                            item {//application portal
                                 OutlinedCard(
                                     modifier = Modifier
                                         .aspectRatio(1f),
@@ -388,6 +391,56 @@ fun HomeViewContent(
                                                 .fillMaxWidth()
                                                 .padding(5.dp),
                                             text = "Application Portal",
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis,
+                                            style = TextStyle(
+                                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                                fontFamily = overpassMonoBold
+                                            ),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        if(role!=OtherConstants.STUDENT && role!=OtherConstants.ADMIN){
+                            item {//interview process
+                                OutlinedCard(
+                                    modifier = Modifier
+                                        .aspectRatio(1f),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    border = BorderStroke(
+                                        3.dp,
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    elevation = CardDefaults.cardElevation(
+                                        defaultElevation = 10.dp
+                                    ),
+                                    shape = RoundedCornerShape(25.dp),
+                                    onClick = {
+                                        
+                                    }
+                                ) {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+
+                                        ) {
+                                        Icon(
+                                            modifier = Modifier.size(40.dp),
+                                            painter = painterResource(R.drawable.ic_portal),
+                                            contentDescription = "Portal"
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(5.dp),
+                                            text = "Interview Process",
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis,
                                             style = TextStyle(

@@ -4,5 +4,6 @@ data class ApplicationData(
     var batchId: String = "",
     var studentId: String = "",
     var processId: Int = 0,
-    var docId: String = ""
+    var docId: String = "",
+    var appliedAt: Long = 0
 )

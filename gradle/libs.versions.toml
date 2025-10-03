@@ -14,10 +14,13 @@ coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
+kotstep = "3.0.0"
+kotstepVersion = "3.0.1"
 lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 lottieCompose = "6.4.0"
+material3 = "1.4.0"
 navigationCompose = "2.9.3"
 navigationComposeJvmstubs = "2.9.3"
 googleGmsGoogleServices = "4.4.3"
@@ -62,7 +65,10 @@ androidx-navigation-compose-jvmstubs = { group = "androidx.navigation", name = "
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
+kotstep = { module = "com.github.binayshaw7777:KotStep", version.ref = "kotstep" }
+kotstep-v301 = { module = "com.github.binayshaw7777:KotStep", version.ref = "kotstepVersion" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-auth-api-phone = { module = "com.google.android.gms:play-services-auth-api-phone" }
 

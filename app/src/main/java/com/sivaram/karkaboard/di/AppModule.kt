@@ -3,6 +3,8 @@ package com.sivaram.karkaboard.di
 import android.content.Context
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
 import com.sivaram.karkaboard.data.remote.repo.DatabaseRepositoryImpl
+import com.sivaram.karkaboard.ui.applicationportal.repo.ApplicationPortalRepo
+import com.sivaram.karkaboard.ui.applicationportal.repo.ApplicationPortalRepoImpl
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepositoryImpl
 import com.sivaram.karkaboard.ui.base.NetworkConnectivityService
@@ -41,4 +43,7 @@ object AppModule {
     @Singleton
     fun provideManageBatchesRepo(): ManageBatchesRepo = ManageBatchesRepoImpl()
 
+    @Provides
+    @Singleton
+    fun provideApplicationPortalRepo(): ApplicationPortalRepo = ApplicationPortalRepoImpl()
 }

@@ -118,8 +118,9 @@ class DatabaseRepositoryImpl: DatabaseRepository  {
                         return@addSnapshotListener
                     }
                     if (snapshot != null) {
-                        val appliedBatchId = snapshot.documents.map{it.id}.toSet()
-
+                        Log.d("getApplicationPortalData ","applications -> ${snapshot.documents}")
+                        val appliedBatchId = snapshot.documents.map{it.get("batchId")}.toSet()
+                        Log.d("getApplicationPortalData ","applicationId -> $appliedBatchId")
                         firebaseFireStore.collection(DbConstants.BATCHES_TABLE).whereEqualTo("open",true)
                             .addSnapshotListener {
                                     batchSnapshot,error ->
