@@ -3,12 +3,14 @@ package com.sivaram.karkaboard.ui.auth.fake
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sivaram.karkaboard.data.dto.ApplicationPortalData
+import com.sivaram.karkaboard.data.dto.AppliedStudentData
 import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StaffData
 import com.sivaram.karkaboard.data.dto.StudentsData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
+import com.sivaram.karkaboard.ui.interviewmanagement.state.SelectState
 import com.sivaram.karkaboard.ui.managestaffs.state.RemoveStaffState
 
 class FakeDbRepo: DatabaseRepository {
@@ -30,5 +32,16 @@ class FakeDbRepo: DatabaseRepository {
 
     override suspend fun getApplicationPortalData(studentId: String): LiveData<List<ApplicationPortalData>> {
         return MutableLiveData(emptyList())
+    }
+
+    override suspend fun getAppliedStudentDetail(batchId: String): LiveData<List<AppliedStudentData>> {
+        return MutableLiveData(emptyList())
+    }
+
+    override suspend fun moveToNextProcess(
+        applicationId: String,
+        processId: Int
+    ): SelectState {
+        return SelectState.Idle
     }
 }

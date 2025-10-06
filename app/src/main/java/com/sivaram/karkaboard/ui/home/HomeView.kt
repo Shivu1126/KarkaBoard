@@ -422,7 +422,7 @@ fun HomeViewContent(
                                     ),
                                     shape = RoundedCornerShape(25.dp),
                                     onClick = {
-                                        
+                                        navController.navigate(NavConstants.INTERVIEW_MANAGEMENT)
                                     }
                                 ) {
                                     Column(
@@ -433,14 +433,14 @@ fun HomeViewContent(
                                         ) {
                                         Icon(
                                             modifier = Modifier.size(40.dp),
-                                            painter = painterResource(R.drawable.ic_portal),
-                                            contentDescription = "Portal"
+                                            painter = painterResource(R.drawable.ic_interview_management),
+                                            contentDescription = "Interview_management"
                                         )
                                         Text(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(5.dp),
-                                            text = "Interview Process",
+                                            text = "Interview Management",
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis,
                                             style = TextStyle(

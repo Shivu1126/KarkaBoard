@@ -14,6 +14,7 @@ import com.sivaram.karkaboard.ui.home.HomeView
 import com.sivaram.karkaboard.ui.auth.login.LoginView
 import com.sivaram.karkaboard.ui.auth.register.RegisterView
 import com.sivaram.karkaboard.ui.base.BaseView
+import com.sivaram.karkaboard.ui.interviewmanagement.InterviewManagementView
 import com.sivaram.karkaboard.ui.managebatches.ManageBatchesView
 import com.sivaram.karkaboard.ui.managebatches.createnewbatch.CreateNewBatchView
 import com.sivaram.karkaboard.ui.managestaffs.ManageStaffsView
@@ -76,6 +77,9 @@ fun Navigation( navController: NavHostController, context: Context){
         }
         composable(NavConstants.APPLICATION_PORTAL) {
             ApplicationPortalView(navController, context)
+        }
+        composable(NavConstants.INTERVIEW_MANAGEMENT) {
+            InterviewManagementView(navController, context)
         }
     }
 }

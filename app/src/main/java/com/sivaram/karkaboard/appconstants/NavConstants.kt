@@ -12,4 +12,5 @@ object NavConstants {
     const val CREATE_NEW_BATCH = "create_new_batch"
     const val MANAGE_BATCHES = "manage_batches"
     const val APPLICATION_PORTAL = "application_portal"
+    const val INTERVIEW_MANAGEMENT = "interview_management"
 }

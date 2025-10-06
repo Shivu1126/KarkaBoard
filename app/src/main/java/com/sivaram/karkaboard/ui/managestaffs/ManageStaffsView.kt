@@ -211,8 +211,8 @@ fun ManageStaffsViewContent(navController: NavController, context: Context, mana
                                 modifier = Modifier
                                     .height(100.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.secondaryContainer
+                                    containerColor = MaterialTheme.colorScheme.onSecondary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 ),
                                 onClick = {
                                     navController.navigate(NavConstants.STAFF_PROFILE + "/${staff.uId}")
@@ -228,7 +228,7 @@ fun ManageStaffsViewContent(navController: NavController, context: Context, mana
                                         modifier = Modifier
                                             .size(70.dp),
                                         colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                         ),
                                         shape = CircleShape
                                     ) {
@@ -255,7 +255,7 @@ fun ManageStaffsViewContent(navController: NavController, context: Context, mana
                                                           Log.d("load image", it.result.throwable.message.toString())},
                                                 onSuccess = {bgIcon = false
                                                             Log.d("load image", "image loaded successfully")},
-                                                colorFilter = if(bgIcon) ColorFilter.tint(MaterialTheme.colorScheme.secondaryContainer) else null
+                                                colorFilter = if(bgIcon) ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer) else null
                                             )
                                         }
                                     }
