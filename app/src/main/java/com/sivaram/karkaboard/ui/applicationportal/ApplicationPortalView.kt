@@ -462,7 +462,7 @@ fun ApplicationPortalViewContent(
 }
 
 @Composable
-fun BottomSheetDesign(bottomSheetParams: BottomSheetParams, applicationPortalViewModel: ApplicationPortalViewModel){
+private fun BottomSheetDesign(bottomSheetParams: BottomSheetParams, applicationPortalViewModel: ApplicationPortalViewModel){
     Log.d("bottomSheetParams", bottomSheetParams.toString())
     val batchData = bottomSheetParams.batchData
     val studentData = bottomSheetParams.studentData

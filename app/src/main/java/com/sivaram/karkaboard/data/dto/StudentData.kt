@@ -1,6 +1,6 @@
 package com.sivaram.karkaboard.data.dto
 
-data class StudentsData (
+data class StudentData (
     var uid: String = "",
     var docId: String = "",
     var isSelected: Boolean = false,

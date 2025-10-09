@@ -42,8 +42,8 @@ class ApplicationPortalRepoImpl: ApplicationPortalRepo {
     override suspend fun getApplicationData(
         batchId: String,
         studentId: String
-    ): LiveData<ApplicationData> {
-        val applicationData = MutableLiveData<ApplicationData>()
+    ): LiveData<ApplicationData?> {
+        val applicationData = MutableLiveData<ApplicationData?>()
         try{
             firebaseFireStore.collection(DbConstants.APPLICATION_TABLE)
                 .addSnapshotListener {

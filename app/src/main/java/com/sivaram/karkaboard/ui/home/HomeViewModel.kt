@@ -1,13 +1,12 @@
 package com.sivaram.karkaboard.ui.home
 
 import android.content.Context
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.sivaram.karkaboard.data.dto.StudentsData
+import com.sivaram.karkaboard.data.dto.StudentData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.local.ResetPasswordPref
 import com.sivaram.karkaboard.data.local.RolePrefs
@@ -33,8 +32,8 @@ class HomeViewModel @Inject constructor(
     private var _userData = MutableStateFlow<UserData?>(null)
     val userData: StateFlow<UserData?> = _userData
 
-    private val _studentData = MutableLiveData<StudentsData?>(null)
-    val studentData: LiveData<StudentsData?> = _studentData
+    private val _studentData = MutableLiveData<StudentData?>(null)
+    val studentData: LiveData<StudentData?> = _studentData
 
     fun signOut(context: Context){
         viewModelScope.launch {

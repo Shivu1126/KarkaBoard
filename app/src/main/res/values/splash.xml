@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#bce9ff</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/outline_diamond_24</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
         <item name="postSplashScreenTheme">@style/Theme.KarkaBoard</item>"
     </style>
 </resources>

@@ -355,51 +355,103 @@ fun HomeViewContent(
                             }
                         }
                         if(role==OtherConstants.STUDENT && studentData?.isSelected!=true ){
-                            item {//application portal
-                                OutlinedCard(
-                                    modifier = Modifier
-                                        .aspectRatio(1f),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ),
-                                    border = BorderStroke(
-                                        3.dp,
-                                        MaterialTheme.colorScheme.onPrimaryContainer
-                                    ),
-                                    elevation = CardDefaults.cardElevation(
-                                        defaultElevation = 10.dp
-                                    ),
-                                    shape = RoundedCornerShape(25.dp),
-                                    onClick = {
-                                        navController.navigate(NavConstants.APPLICATION_PORTAL)
-                                    }
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
+                            if(studentData?.isSelected!=true) {
+                                item {//application portal
+                                    OutlinedCard(
+                                        modifier = Modifier
+                                            .aspectRatio(1f),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                        ),
+                                        border = BorderStroke(
+                                            3.dp,
+                                            MaterialTheme.colorScheme.onPrimaryContainer
+                                        ),
+                                        elevation = CardDefaults.cardElevation(
+                                            defaultElevation = 10.dp
+                                        ),
+                                        shape = RoundedCornerShape(25.dp),
+                                        onClick = {
+                                            navController.navigate(NavConstants.APPLICATION_PORTAL)
+                                        }
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.fillMaxSize(),
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally,
 
-                                        ) {
-                                        Icon(
-                                            modifier = Modifier.size(40.dp),
-                                            painter = painterResource(R.drawable.ic_portal),
-                                            contentDescription = "Portal"
-                                        )
-                                        Text(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(5.dp),
-                                            text = "Application Portal",
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                            style = TextStyle(
-                                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
-                                                fontFamily = overpassMonoBold
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
+                                            ) {
+                                            Icon(
+                                                modifier = Modifier.size(40.dp),
+                                                painter = painterResource(R.drawable.ic_portal),
+                                                contentDescription = "Portal"
+                                            )
+                                            Text(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(5.dp),
+                                                text = "Application Portal",
+                                                maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis,
+                                                style = TextStyle(
+                                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                    fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                                    fontFamily = overpassMonoBold
+                                                ),
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                item {//application portal
+                                    OutlinedCard(
+                                        modifier = Modifier
+                                            .aspectRatio(1f),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                        ),
+                                        border = BorderStroke(
+                                            3.dp,
+                                            MaterialTheme.colorScheme.onPrimaryContainer
+                                        ),
+                                        elevation = CardDefaults.cardElevation(
+                                            defaultElevation = 10.dp
+                                        ),
+                                        shape = RoundedCornerShape(25.dp),
+                                        onClick = {
+                                            navController.navigate(NavConstants.APPLICATION_PORTAL)
+                                        }
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.fillMaxSize(),
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+
+                                            ) {
+                                            Icon(
+                                                modifier = Modifier.size(40.dp),
+                                                painter = painterResource(R.drawable.ic_portal),
+                                                contentDescription = "View Task"
+                                            )
+                                            Text(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(5.dp),
+                                                text = "View Tasks",
+                                                maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis,
+                                                style = TextStyle(
+                                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                    fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                                    fontFamily = overpassMonoBold
+                                                ),
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -469,7 +521,7 @@ fun DrawerContent(
     navController: NavController,
     logoutState: LogoutState
 ) {
-
+    val role = RolePrefs.getRole(context).collectAsState(initial = "Unknown").value
     var bgIcon by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = Modifier
@@ -572,6 +624,37 @@ fun DrawerContent(
                 .weight(1f) // take remaining space
                 .verticalScroll(rememberScrollState())
         ) {
+
+            if(role == OtherConstants.STUDENT){
+                NavigationDrawerItem(
+                    label = {
+                        Text(
+                            text = "Interview History",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                fontFamily = overpassMonoBold
+                            )
+                        )
+                    },
+                    icon = {
+                        Icon(
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(30.dp),
+                            painter = painterResource(R.drawable.ic_edit),
+                            contentDescription = "edit profile"
+                        )
+                    },
+                    onClick = {
+
+                    },
+                    selected = false
+                )
+            }
+
             NavigationDrawerItem(
                 label = {
                     Text(

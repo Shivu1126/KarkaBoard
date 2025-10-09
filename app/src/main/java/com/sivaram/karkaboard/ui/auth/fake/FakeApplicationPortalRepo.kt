@@ -17,7 +17,7 @@ class FakeApplicationPortalRepo: ApplicationPortalRepo {
     override suspend fun getApplicationData(
         batchId: String,
         studentId: String
-    ): LiveData<ApplicationData> {
+    ): LiveData<ApplicationData?> {
         return MutableLiveData()
     }
 }
