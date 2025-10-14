@@ -17,6 +17,13 @@ class ApplicationPortalRepoImpl: ApplicationPortalRepo {
     override suspend fun applyForTraining(batchId: String, studentId: String): ApplyState {
         Log.d("LogData","applyForTraining() -> $batchId $studentId")
         return try {
+            val studentData = firebaseFireStore.collection(DbConstants.APPLICATION_TABLE).whereEqualTo("studentId",studentId)
+                .get().await().toObjects(ApplicationData::class.java)
+            for (data in studentData){
+                if(data.processId>=1 && data.processId<=3){
+                    return ApplyState.Success("You are already in process.", false)
+                }
+            }
             val applicationDoc = firebaseFireStore.collection(DbConstants.APPLICATION_TABLE).document()
             val docId = applicationDoc.id
             val applicationData = ApplicationData(
@@ -24,7 +31,9 @@ class ApplicationPortalRepoImpl: ApplicationPortalRepo {
                 studentId = studentId,
                 processId = 1,
                 docId = docId,
-                appliedAt = System.currentTimeMillis()
+                appliedAt = System.currentTimeMillis(),
+                feedback = "",
+                performanceRating = 0
             )
             applicationDoc.set(applicationData).await()
             val batchObj = firebaseFireStore.collection(DbConstants.BATCHES_TABLE).document(batchId)
@@ -32,7 +41,7 @@ class ApplicationPortalRepoImpl: ApplicationPortalRepo {
             firebaseFireStore.collection(DbConstants.BATCHES_TABLE).document(batchId).update(
                 "appliedCount", batchObj?.appliedCount?.plus(1)
             ).await()
-            ApplyState.Success("Applied Successfully")
+            ApplyState.Success("Applied Successfully.", true)
         }
         catch (e: Exception){
             ApplyState.Error(e.localizedMessage ?: "Check failed")
@@ -60,7 +69,9 @@ class ApplicationPortalRepoImpl: ApplicationPortalRepo {
                                     null
                                 }
                              }
-                        applicationData.value = result[0]
+                        if(result.isNotEmpty()) {
+                            applicationData.value = result[0]
+                        }
                     }
                 }
         }

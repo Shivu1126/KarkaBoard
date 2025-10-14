@@ -27,6 +27,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomSheetDefaults.DragHandle
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -42,7 +46,9 @@ import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -75,6 +81,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -89,6 +96,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.sivaram.karkaboard.data.dto.DialogBoxParams
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
@@ -96,6 +104,7 @@ import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.UiState
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
+import com.sivaram.karkaboard.ui.theme.overpassMonoMedium
 import com.sivaram.karkaboard.ui.theme.overpassMonoRegular
 import com.sivaram.karkaboard.ui.theme.overpassMonoSemiBold
 import com.sivaram.karkaboard.ui.theme.success
@@ -201,6 +210,8 @@ fun InterviewManagementViewContent(
         skipPartiallyExpanded = false,
     )
     var bottomSheetParam by remember { mutableStateOf<UserData?>(null) }
+    var openDialog by rememberSaveable { mutableStateOf(false) }
+    var dialogParams by remember { mutableStateOf<DialogBoxParams?>(null) }
 
     LaunchedEffect(Unit) {
         interviewManagementViewModel.getAllBatches()
@@ -413,7 +424,7 @@ fun InterviewManagementViewContent(
                             }
                         }
                     }
-                    when(uiState){
+                    when (uiState) {
                         UiState.Empty -> {
                             Box(
                                 modifier = Modifier
@@ -427,6 +438,7 @@ fun InterviewManagementViewContent(
                                 )
                             }
                         }
+
                         UiState.Error -> {
                             Box(
                                 modifier = Modifier
@@ -442,9 +454,14 @@ fun InterviewManagementViewContent(
                                     ),
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
-                                Toast.makeText(context, "Something went wrong, Please check your internet connection", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Something went wrong, Please check your internet connection",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
+
                         UiState.Loading -> {
                             Box(
                                 modifier = Modifier
@@ -457,6 +474,7 @@ fun InterviewManagementViewContent(
                                 )
                             }
                         }
+
                         UiState.Success -> {
                             LazyVerticalGrid(
                                 modifier = Modifier
@@ -552,14 +570,25 @@ fun InterviewManagementViewContent(
                                                                     error = painterResource(R.drawable.ic_user_profile),
                                                                     onError = {
                                                                         bgIcon = true
-                                                                        Log.d("load image", "error on loading image")
-                                                                        Log.d("load image", it.result.throwable.message.toString())
+                                                                        Log.d(
+                                                                            "load image",
+                                                                            "error on loading image"
+                                                                        )
+                                                                        Log.d(
+                                                                            "load image",
+                                                                            it.result.throwable.message.toString()
+                                                                        )
                                                                     },
                                                                     onSuccess = {
                                                                         bgIcon = false
-                                                                        Log.d("load image", "image loaded successfully")
+                                                                        Log.d(
+                                                                            "load image",
+                                                                            "image loaded successfully"
+                                                                        )
                                                                     },
-                                                                    colorFilter = if (bgIcon) ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer) else null
+                                                                    colorFilter = if (bgIcon) ColorFilter.tint(
+                                                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                                                    ) else null
                                                                 )
                                                             }
                                                         }
@@ -684,9 +713,16 @@ fun InterviewManagementViewContent(
                                                                     enabled = declineState !is DeclineState.Loading,
                                                                     modifier = Modifier.fillMaxWidth(),
                                                                     onClick = {
-                                                                        interviewManagementViewModel.declineCandidateForInterview(
-                                                                            applicationData
-                                                                        )
+//                                                                        interviewManagementViewModel.declineCandidateForInterview(
+//                                                                            applicationData
+//                                                                        )
+                                                                        openDialog = true
+                                                                        dialogParams =
+                                                                            DialogBoxParams(
+                                                                                applicationData,
+                                                                                "",
+                                                                                1
+                                                                            )
                                                                     },
                                                                     colors = ButtonDefaults.outlinedButtonColors(
                                                                         containerColor = MaterialTheme.colorScheme.onSecondary,
@@ -725,6 +761,8 @@ fun InterviewManagementViewContent(
                                                                                     fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
                                                                                     fontFamily = overpassMonoBold
                                                                                 ),
+                                                                                maxLines = 1,
+                                                                                overflow = TextOverflow.Ellipsis
                                                                             )
 
                                                                         DeclineState.Loading ->
@@ -749,18 +787,6 @@ fun InterviewManagementViewContent(
                                                                             )
                                                                         }
                                                                     }
-
-                                                                    Text(
-                                                                        textAlign = TextAlign.Center,
-                                                                        text = "Decline",
-                                                                        style = TextStyle(
-                                                                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                                                            fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
-                                                                            fontFamily = overpassMonoBold
-                                                                        ),
-                                                                        maxLines = 1,
-                                                                        overflow = TextOverflow.Ellipsis
-                                                                    )
                                                                 }
                                                             }
                                                         } else if (applicationData.processId == 2) {
@@ -789,9 +815,16 @@ fun InterviewManagementViewContent(
                                                                     ApplicationState.Idle -> {
                                                                         IconButton(
                                                                             onClick = {
-                                                                                interviewManagementViewModel.rejectedFromInterview(
-                                                                                    applicationData
-                                                                                )
+//                                                                                interviewManagementViewModel.rejectedFromInterview(
+//                                                                                    applicationData
+//                                                                                )
+                                                                                openDialog = true
+                                                                                dialogParams =
+                                                                                    DialogBoxParams(
+                                                                                        applicationData,
+                                                                                        "",
+                                                                                        2
+                                                                                    )
                                                                             }
                                                                         ) {
                                                                             Icon(
@@ -807,10 +840,17 @@ fun InterviewManagementViewContent(
                                                                         }
                                                                         IconButton(
                                                                             onClick = {
-                                                                                interviewManagementViewModel.selectedForTraining(
-                                                                                    applicationData,
-                                                                                    studentData.docId
-                                                                                )
+//                                                                                interviewManagementViewModel.selectedForTraining(
+//                                                                                    applicationData,
+//                                                                                    studentData.docId
+//                                                                                )
+                                                                                openDialog = true
+                                                                                dialogParams =
+                                                                                    DialogBoxParams(
+                                                                                        applicationData,
+                                                                                        studentData.docId,
+                                                                                        3
+                                                                                    )
                                                                             }
                                                                         ) {
                                                                             Icon(
@@ -999,6 +1039,189 @@ fun InterviewManagementViewContent(
             }
         }
     }
+    if (openDialog && dialogParams != null) {
+        var feedback by rememberSaveable { mutableStateOf("") }
+        var ratingStar by rememberSaveable { mutableIntStateOf(0) }
+        BasicAlertDialog(
+            onDismissRequest = {
+                openDialog = false
+                dialogParams = null
+            },
+        ) {
+            Surface(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = AlertDialogDefaults.TonalElevation,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(
+                        16.dp,
+                        alignment = Alignment.CenterVertically
+                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        modifier = Modifier.size(35.dp),
+                        painter = painterResource(R.drawable.ic_feedback),
+                        contentDescription = "Feedback",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = if(dialogParams?.callTo==1 || dialogParams?.callTo==2) "Are you sure you want to reject this candidate?"
+                                else "Are you sure you want to select this candidate?",
+                        style = TextStyle(
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                            fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                            fontFamily = overpassMonoBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(
+                            4.dp,
+                            alignment = Alignment.CenterVertically
+                        ),
+                    ) {
+                        Text(
+                            text = "Give your feedback if any",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                fontFamily = overpassMonoSemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        OutlinedCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(100.dp)
+                        ) {
+                            BasicTextField(
+                                value = feedback,
+                                onValueChange = {
+                                    feedback = it
+                                },
+                                modifier = Modifier.fillMaxSize()
+                                    .padding(8.dp),
+                                textStyle = TextStyle(
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                    fontFamily = overpassMonoMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
+                            )
+                        }
+                    }
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(
+                            4.dp,
+                            alignment = Alignment.CenterVertically
+                        ),
+                    ) {
+                        Text(
+                            text = "Performance Rating",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                fontFamily = overpassMonoSemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(
+                                4.dp,
+                                alignment = Alignment.CenterHorizontally
+                            ),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            for(index in 1..5){
+                                IconButton(
+                                    onClick = {
+                                        ratingStar = index
+                                    },
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(70.dp),
+                                        painter = painterResource(
+                                            if (index > ratingStar)
+                                                R.drawable.ic_star
+                                            else
+                                                R.drawable.ic_star_fill
+                                        ),
+                                        contentDescription = "Star",
+                                        tint = if (index > ratingStar) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.align(Alignment.End),
+                    ) {
+                        TextButton(
+                            onClick = {
+                                openDialog = false
+                                dialogParams = null
+                            },
+                        ) {
+                            Text(
+                                text = "Cancel",
+                                style = TextStyle(
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                    fontFamily = overpassMonoSemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                ))
+                        }
+                        TextButton(
+                            onClick = {
+                                if(feedback.isEmpty() || ratingStar==0){
+                                    Toast.makeText(context, "Please give a feedback and rating", Toast.LENGTH_SHORT).show()
+                                }
+                                else {
+                                    dialogParams?.applicationData?.let { data ->
+                                        data.feedback = feedback
+                                        data.performanceRating = ratingStar
+                                        if (dialogParams!!.callTo == 1) {
+                                            interviewManagementViewModel.declineCandidateForInterview(
+                                                data
+                                            )
+                                        } else if (dialogParams!!.callTo == 2) {
+                                            interviewManagementViewModel.rejectedFromInterview(data)
+                                        } else {
+                                            interviewManagementViewModel.selectedForTraining(
+                                                data, dialogParams!!.studentDocId
+                                            )
+                                        }
+                                    }
+                                    openDialog = false
+                                    dialogParams = null
+                                }
+                            },
+                        ) {
+                            Text(
+                                text = "Confirm",
+                                style = TextStyle(
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                    fontFamily = overpassMonoSemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @SuppressLint("UseKtx")
@@ -1006,18 +1229,19 @@ fun InterviewManagementViewContent(
 fun BottomSheetDesign(
     userData: UserData,
     context: Context
-){
+) {
 
     var bgIcon by rememberSaveable { mutableStateOf(false) }
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(bottom = 20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp, alignment = Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-        ){
+        ) {
 
             Text(
                 textDecoration = TextDecoration.Underline,
@@ -1032,7 +1256,10 @@ fun BottomSheetDesign(
         }
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterVertically),
+            verticalArrangement = Arrangement.spacedBy(
+                10.dp,
+                alignment = Alignment.CenterVertically
+            ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedCard(
@@ -1093,20 +1320,23 @@ fun BottomSheetDesign(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 0.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(
+                10.dp,
+                alignment = Alignment.CenterHorizontally
+            ),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             OutlinedButton(
                 onClick = {
                     val intent = Intent(Intent.ACTION_SENDTO).apply {
                         data = Uri.parse("mailto:") // only email apps should handle this
                         putExtra(Intent.EXTRA_EMAIL, arrayOf(userData.email))
                     }
-                    try{
+                    try {
                         context.startActivity(intent)
-                    }catch (e: ActivityNotFoundException){
+                    } catch (e: ActivityNotFoundException) {
                         Toast.makeText(context, "No email app found", Toast.LENGTH_SHORT).show()
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                     }
 
@@ -1132,7 +1362,10 @@ fun BottomSheetDesign(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.CenterHorizontally)
+                    horizontalArrangement = Arrangement.spacedBy(
+                        0.dp,
+                        alignment = Alignment.CenterHorizontally
+                    )
                 ) {
                     Icon(
                         modifier = Modifier.size(30.dp),
@@ -1158,7 +1391,7 @@ fun BottomSheetDesign(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
 
-                        )
+                            )
                         Text(
                             text = userData.email,
                             style = TextStyle(
@@ -1193,11 +1426,14 @@ fun BottomSheetDesign(
                 ),
                 shape = RoundedCornerShape(20.dp),
                 contentPadding = PaddingValues(horizontal = 10.dp)
-            ){
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.CenterHorizontally)
+                    horizontalArrangement = Arrangement.spacedBy(
+                        0.dp,
+                        alignment = Alignment.CenterHorizontally
+                    )
                 ) {
                     Icon(
                         modifier = Modifier.size(30.dp),
@@ -1226,7 +1462,7 @@ fun BottomSheetDesign(
 
                             )
                         Text(
-                            text = userData.countryCode+userData.mobile,
+                            text = userData.countryCode + userData.mobile,
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
@@ -1248,12 +1484,13 @@ fun BottomSheetDesign(
                     val uri = Uri.parse("https://msnlabs.com/img/resume-sample.pdf")
                     val intent = Intent(Intent.ACTION_VIEW).apply {
                         setDataAndType(uri, "application/pdf")
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
                     }
                     context.startActivity(intent)
                 } catch (e: ActivityNotFoundException) {
                     Toast.makeText(context, "No PDF reader found", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception){
+                } catch (e: Exception) {
                     Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                 }
             },
@@ -1285,7 +1522,7 @@ fun BottomSheetDesign(
                 Color.Transparent
             ),
             shape = RoundedCornerShape(20.dp)
-        ){
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,

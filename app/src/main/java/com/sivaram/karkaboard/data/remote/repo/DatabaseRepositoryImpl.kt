@@ -255,26 +255,23 @@ class DatabaseRepositoryImpl : DatabaseRepository {
     override suspend fun declineForInterview(applicationData: ApplicationData): DeclineState {
         Log.d("LogData", "declineForInterview(): applicationId -> ${applicationData.docId}")
         return try {
-            val batch = firebaseFireStore.batch()
-
-            val applicationRef = firebaseFireStore.collection(DbConstants.APPLICATION_TABLE)
-                .document(applicationData.docId)
-            batch.update(applicationRef, "processId", applicationData.processId + 5)
-
-            val batchDocRef = firebaseFireStore.collection(DbConstants.BATCHES_TABLE)
-                .document(applicationData.batchId)
-            batch.update(batchDocRef, "rejectedCount", FieldValue.increment(1))
-
-            batch.commit().await()
-
+            firebaseFireStore.collection(DbConstants.APPLICATION_TABLE).document(applicationData.docId)
+                .update(
+                    mapOf(
+                        "processId" to applicationData.processId + 5,
+                        "feedback" to applicationData.feedback,
+                        "performanceRating" to applicationData.performanceRating
+                    )
+                ).await()
+            val batchObj = firebaseFireStore.collection(DbConstants.BATCHES_TABLE).document(applicationData.batchId)
+                .get().await().toObject(BatchData::class.java)
+            firebaseFireStore.collection(DbConstants.BATCHES_TABLE).document(applicationData.batchId).update(
+                "rejectedCount", batchObj?.rejectedCount?.plus(1)
+            ).await()
             DeclineState.Success("Success")
         } catch (e: Exception) {
             DeclineState.Error(e.localizedMessage ?: "Check failed")
         }
-//        Use batch() to combine multiple Firestore operations
-//        Reduces snapshot listener triggers from 3 → 1
-//        Reduces recompositions from 3 → 1
-//        Makes your app faster and smoother
     }
 
     override suspend fun selectedForTraining(
@@ -284,7 +281,13 @@ class DatabaseRepositoryImpl : DatabaseRepository {
         return try {
             firebaseFireStore.collection(DbConstants.APPLICATION_TABLE)
                 .document(applicationData.docId)
-                .update("processId", applicationData.processId + 1).await()
+                .update(
+                    mapOf(
+                        "processId" to applicationData.processId + 1,
+                        "feedback" to applicationData.feedback,
+                        "performanceRating" to applicationData.performanceRating
+                    )
+                ).await()
             val batchObj = firebaseFireStore.collection(DbConstants.BATCHES_TABLE)
                 .document(applicationData.batchId)
                 .get().await().toObject(BatchData::class.java)
@@ -308,7 +311,13 @@ class DatabaseRepositoryImpl : DatabaseRepository {
         return try {
             firebaseFireStore.collection(DbConstants.APPLICATION_TABLE)
                 .document(applicationData.docId)
-                .update("processId", applicationData.processId + 5).await()
+                .update(
+                    mapOf(
+                        "processId" to applicationData.processId + 5,
+                        "feedback" to applicationData.feedback,
+                        "performanceRating" to applicationData.performanceRating
+                    )
+                ).await()
             val batchObj = firebaseFireStore.collection(DbConstants.BATCHES_TABLE)
                 .document(applicationData.batchId)
                 .get().await().toObject(BatchData::class.java)

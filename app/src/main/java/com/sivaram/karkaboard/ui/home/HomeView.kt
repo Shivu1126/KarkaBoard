@@ -354,7 +354,7 @@ fun HomeViewContent(
                                 }
                             }
                         }
-                        if(role==OtherConstants.STUDENT && studentData?.isSelected!=true ){
+                        if(role==OtherConstants.STUDENT ){
                             if(studentData?.isSelected!=true) {
                                 item {//application portal
                                     OutlinedCard(
@@ -423,7 +423,7 @@ fun HomeViewContent(
                                         ),
                                         shape = RoundedCornerShape(25.dp),
                                         onClick = {
-                                            navController.navigate(NavConstants.APPLICATION_PORTAL)
+
                                         }
                                     ) {
                                         Column(
@@ -434,14 +434,14 @@ fun HomeViewContent(
                                             ) {
                                             Icon(
                                                 modifier = Modifier.size(40.dp),
-                                                painter = painterResource(R.drawable.ic_portal),
+                                                painter = painterResource(R.drawable.ic_tasks),
                                                 contentDescription = "View Task"
                                             )
                                             Text(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .padding(5.dp),
-                                                text = "View Tasks",
+                                                text = "Tasks And Assignments",
                                                 maxLines = 2,
                                                 overflow = TextOverflow.Ellipsis,
                                                 style = TextStyle(
@@ -644,7 +644,7 @@ fun DrawerContent(
                         Icon(
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.size(30.dp),
-                            painter = painterResource(R.drawable.ic_edit),
+                            painter = painterResource(R.drawable.ic_history),
                             contentDescription = "edit profile"
                         )
                     },

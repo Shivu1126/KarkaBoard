@@ -5,5 +5,7 @@ data class ApplicationData(
     var studentId: String = "",
     var processId: Int = 0,
     var docId: String = "",
-    var appliedAt: Long = 0
+    var appliedAt: Long = 0,
+    var feedback: String = "",
+    var performanceRating: Int = 0
 )
