@@ -1,11 +1,9 @@
 <!-- PROJECT LOGO -->
-<br />
 <div align="center">
   <a href="#">
-    <img src="assets/logo.png" alt="Logo" width="100" height="100">
+    <img src="https://github.com/user-attachments/assets/d445fb70-7e08-44a7-b98e-9e98e683b47d" alt="Logo" width="100" height="100">
   </a>
-
-  <h1 align="center">🧩 KarkaBoard</h1>
+  <h1 align="center">KarkaBoard</h1>
   <h3 align="center">"The Smart Board for Smart Students"</h3>
 
   <p align="center">
