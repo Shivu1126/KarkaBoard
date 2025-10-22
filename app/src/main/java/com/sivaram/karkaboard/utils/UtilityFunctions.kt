@@ -33,4 +33,9 @@ object UtilityFunctions {
         )
         return brush
     }
+    fun convertLongToDateTimeAmPm(timestamp: Long): String {
+        val date = Date(timestamp)
+        val format = SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.getDefault())
+        return format.format(date)
+    }
 }

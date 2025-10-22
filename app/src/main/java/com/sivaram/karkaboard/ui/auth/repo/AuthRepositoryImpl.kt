@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
@@ -14,10 +15,15 @@ import com.sivaram.karkaboard.appconstants.DbConstants
 import com.sivaram.karkaboard.appconstants.OtherConstants
 import com.sivaram.karkaboard.data.dto.StudentData
 import com.sivaram.karkaboard.data.dto.UserData
+import com.sivaram.karkaboard.ui.auth.changepassword.ChangePasswordView
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
+import com.sivaram.karkaboard.ui.auth.state.ChangePasswordState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
 import com.sivaram.karkaboard.ui.auth.state.LogoutState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -223,7 +229,6 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun resetPassword(
         newPassword: String,
-        context: Context,
         onResult: (Boolean) -> Unit
     ) {
         return try{
@@ -235,7 +240,7 @@ class AuthRepositoryImpl : AuthRepository {
         }
     }
 
-    override suspend fun signOut(context: Context): LogoutState {
+    override suspend fun signOut(): LogoutState {
 
         return try {
             auth.signOut()
@@ -250,6 +255,29 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun getAuth(): FirebaseAuth {
         return auth
+    }
+
+    override suspend fun changePassword(
+        email: String,
+        oldPassword: String,
+        newPassword: String
+    ): ChangePasswordState {
+        Log.d("phoneBook", "changePassword: $email $oldPassword $newPassword")
+        return try{
+            val user = auth.currentUser
+            if(user!=null){
+                val credential = EmailAuthProvider.getCredential(email, oldPassword)
+                user.reauthenticate(credential).await()
+                user.updatePassword(newPassword).await()
+                ChangePasswordState.Success("Password changed successfully")
+            }else{
+                ChangePasswordState.Error("Something went wrong")
+            }
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            ChangePasswordState.Error("Old password is incorrect")
+        } catch (e: Exception){
+            ChangePasswordState.Error("Failed to change password")
+        }
     }
 
     private suspend fun isEmailAlreadyInUse(email: String): Boolean {

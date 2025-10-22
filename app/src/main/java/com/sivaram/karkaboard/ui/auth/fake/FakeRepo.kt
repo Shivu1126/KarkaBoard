@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.auth.repo.AuthRepository
 import com.sivaram.karkaboard.ui.auth.state.AuthFlowState
+import com.sivaram.karkaboard.ui.auth.state.ChangePasswordState
 import com.sivaram.karkaboard.ui.auth.state.LoginState
 import com.sivaram.karkaboard.ui.auth.state.LogoutState
 import com.sivaram.karkaboard.ui.auth.state.VerifyState
@@ -57,18 +58,25 @@ class FakeRepo : AuthRepository {
 
     override suspend fun resetPassword(
         password: String,
-        context: Context,
         onResult: (Boolean) -> Unit
     ) {
 
     }
 
-    override suspend fun signOut(context: Context): LogoutState {
+    override suspend fun signOut(): LogoutState {
         return LogoutState.Idle
     }
 
     override suspend fun getAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
+    }
+
+    override suspend fun changePassword(
+        email: String,
+        oldPassword: String,
+        newPassword: String
+    ): ChangePasswordState {
+        return ChangePasswordState.Idle
     }
 
 }

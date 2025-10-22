@@ -9,11 +9,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.sivaram.karkaboard.appconstants.NavConstants
 import com.sivaram.karkaboard.ui.applicationportal.ApplicationPortalView
+import com.sivaram.karkaboard.ui.auth.changepassword.ChangePasswordView
 import com.sivaram.karkaboard.ui.auth.forgetpassword.ResetPasswordView
 import com.sivaram.karkaboard.ui.home.HomeView
 import com.sivaram.karkaboard.ui.auth.login.LoginView
 import com.sivaram.karkaboard.ui.auth.register.RegisterView
 import com.sivaram.karkaboard.ui.base.BaseView
+import com.sivaram.karkaboard.ui.interviewhistory.InterviewHistoryView
 import com.sivaram.karkaboard.ui.interviewmanagement.InterviewManagementView
 import com.sivaram.karkaboard.ui.managebatches.ManageBatchesView
 import com.sivaram.karkaboard.ui.managebatches.createnewbatch.CreateNewBatchView
@@ -80,6 +82,12 @@ fun Navigation( navController: NavHostController, context: Context){
         }
         composable(NavConstants.INTERVIEW_MANAGEMENT) {
             InterviewManagementView(navController, context)
+        }
+        composable(NavConstants.INTERVIEW_HISTORY) {
+            InterviewHistoryView(navController, context)
+        }
+        composable(NavConstants.CHANGE_PASSWORD) {
+            ChangePasswordView(navController, context)
         }
     }
 }

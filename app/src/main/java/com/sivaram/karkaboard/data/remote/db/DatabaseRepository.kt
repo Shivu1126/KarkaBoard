@@ -2,6 +2,7 @@ package com.sivaram.karkaboard.data.remote.db
 
 import androidx.lifecycle.LiveData
 import com.sivaram.karkaboard.data.dto.ApplicationData
+import com.sivaram.karkaboard.data.dto.InterviewHistoryData
 import com.sivaram.karkaboard.data.dto.ApplicationPortalData
 import com.sivaram.karkaboard.data.dto.AppliedStudentData
 import com.sivaram.karkaboard.data.dto.BatchData
@@ -23,4 +24,5 @@ interface DatabaseRepository {
     suspend fun declineForInterview(applicationData: ApplicationData): DeclineState
     suspend fun selectedForTraining(applicationData: ApplicationData, studentDocId: String): ApplicationState
     suspend fun rejectedFromInterview(applicationData: ApplicationData): ApplicationState
+    suspend fun getInterviewHistory(studentId: String): LiveData<List<InterviewHistoryData>>
 }

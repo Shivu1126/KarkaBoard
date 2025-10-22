@@ -645,11 +645,11 @@ fun DrawerContent(
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.size(30.dp),
                             painter = painterResource(R.drawable.ic_history),
-                            contentDescription = "edit profile"
+                            contentDescription = "interview history"
                         )
                     },
                     onClick = {
-
+                        navController.navigate(NavConstants.INTERVIEW_HISTORY)
                     },
                     selected = false
                 )
@@ -706,7 +706,7 @@ fun DrawerContent(
                     )
                 },
                 onClick = {
-
+                    navController.navigate(NavConstants.CHANGE_PASSWORD)
                 },
                 selected = false
             )
@@ -738,7 +738,7 @@ fun DrawerContent(
                 )
             },
             onClick = {
-                homeViewModel.signOut(context)
+                homeViewModel.signOut()
             },
             selected = false,
         )

@@ -35,10 +35,10 @@ class HomeViewModel @Inject constructor(
     private val _studentData = MutableLiveData<StudentData?>(null)
     val studentData: LiveData<StudentData?> = _studentData
 
-    fun signOut(context: Context){
+    fun signOut(){
         viewModelScope.launch {
             _logoutState.value = LogoutState.Idle
-            _logoutState.value = authRepository.signOut(context)
+            _logoutState.value = authRepository.signOut()
         }
     }
 

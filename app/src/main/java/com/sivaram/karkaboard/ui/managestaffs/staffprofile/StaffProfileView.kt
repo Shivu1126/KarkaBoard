@@ -232,7 +232,7 @@ fun StaffProfileViewContent(
                         )
                         Text(
                             text = staffData?.companyMail ?: "",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -248,7 +248,7 @@ fun StaffProfileViewContent(
                     ){
                         Text(
                             text = "Email",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -256,7 +256,7 @@ fun StaffProfileViewContent(
                         )
                         Text(
                             text = staffData?.companyMail ?: "",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -272,7 +272,7 @@ fun StaffProfileViewContent(
                     ){
                         Text(
                             text = "Personal Email",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -280,7 +280,7 @@ fun StaffProfileViewContent(
                         )
                         Text(
                             text = staffData?.email ?: "",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -295,7 +295,7 @@ fun StaffProfileViewContent(
                     ){
                         Text(
                             text = "Mobile No.",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -307,7 +307,7 @@ fun StaffProfileViewContent(
                             } else {
                                 "${staffData?.countryCode}${staffData?.mobile}"
                             },
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -322,7 +322,7 @@ fun StaffProfileViewContent(
                     ){
                         Text(
                             text = "Role",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -330,7 +330,7 @@ fun StaffProfileViewContent(
                         )
                         Text(
                             text =  staffRole?:"Unknown",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
@@ -364,6 +364,13 @@ fun StaffProfileViewContent(
                                     horizontalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterHorizontally),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(20.dp),
+                                        painter = painterResource(R.drawable.ic_delete),
+                                        contentDescription = "Delete",
+                                        tint = MaterialTheme.colorScheme.onErrorContainer
+                                    )
                                     Text(
                                         text = "Remove Staff",
                                         maxLines = 2,
@@ -372,13 +379,6 @@ fun StaffProfileViewContent(
                                             fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
                                         ),
                                         textAlign = TextAlign.Center
-                                    )
-                                    Icon(
-                                        modifier = Modifier
-                                            .size(20.dp),
-                                        painter = painterResource(R.drawable.ic_delete),
-                                        contentDescription = "Delete",
-                                        tint = MaterialTheme.colorScheme.onErrorContainer
                                     )
                                 }
                             }

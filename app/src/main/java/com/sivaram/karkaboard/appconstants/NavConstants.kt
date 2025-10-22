@@ -13,4 +13,6 @@ object NavConstants {
     const val MANAGE_BATCHES = "manage_batches"
     const val APPLICATION_PORTAL = "application_portal"
     const val INTERVIEW_MANAGEMENT = "interview_management"
+    const val INTERVIEW_HISTORY = "interview_history"
+    const val CHANGE_PASSWORD = "change_password"
 }

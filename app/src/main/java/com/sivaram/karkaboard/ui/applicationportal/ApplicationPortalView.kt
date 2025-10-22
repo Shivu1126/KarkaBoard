@@ -164,7 +164,7 @@ fun ApplicationPortalView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ApplicationPortalViewContent(
+private fun ApplicationPortalViewContent(
     userData: UserData?,
     navController: NavController,
     context: Context,
@@ -181,7 +181,7 @@ fun ApplicationPortalViewContent(
 
     LaunchedEffect(userData) {
         Log.d("userData", userData.toString())
-        if(userData!=null) {
+        if (userData != null) {
             applicationPortalViewModel.getApplicationPortalData(userData.uId)
         }
     }
@@ -225,13 +225,12 @@ fun ApplicationPortalViewContent(
                             modifier = Modifier.size(250.dp)
                         )
                     }
-                }
-                else{
+                } else {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(1),
                         verticalArrangement = Arrangement.spacedBy(20.dp),
                     ) {
-                        applicationPortalData?.forEach {data ->
+                        applicationPortalData?.forEach { data ->
                             val batchData = data.batchData
                             val isApplied = data.isApplied
                             val state = applyStates[batchData?.docId] ?: ApplyState.Idle
@@ -292,9 +291,11 @@ fun ApplicationPortalViewContent(
                                                 verticalArrangement = Arrangement.spacedBy(5.dp)
                                             ) {
                                                 Text(
-                                                    text = "Posted at ${UtilityFunctions.convertMillisToDate(
-                                                        batchData?.createdAt ?: 0
-                                                    )}",
+                                                    text = "Posted at ${
+                                                        UtilityFunctions.convertMillisToDate(
+                                                            batchData?.createdAt ?: 0
+                                                        )
+                                                    }",
                                                     style = TextStyle(
                                                         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                                                         fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
@@ -316,7 +317,8 @@ fun ApplicationPortalViewContent(
                                                     )
                                                     Text(
                                                         textAlign = TextAlign.End,
-                                                        text = batchData?.interviewLocation ?: "Unknown",
+                                                        text = batchData?.interviewLocation
+                                                            ?: "Unknown",
                                                         maxLines = 1,
                                                         overflow = TextOverflow.Ellipsis,
                                                         style = TextStyle(
@@ -380,16 +382,16 @@ fun ApplicationPortalViewContent(
                                             OutlinedButton(
                                                 modifier = Modifier.weight(1f),
                                                 onClick = {
-                                                    if(isApplied){
-                                                        bottomSheetParams = batchData?.let { batchData
+                                                    if (isApplied) {
+                                                        bottomSheetParams = batchData?.let {
+                                                            batchData
                                                             userData?.let { studentData ->
                                                                 BottomSheetParams(
                                                                     batchData, studentData
                                                                 )
                                                             }
                                                         }
-                                                    }
-                                                    else{
+                                                    } else {
                                                         applicationPortalViewModel.applyForTraining(
                                                             batchData?.docId ?: "",
                                                             userData?.uId ?: ""
@@ -397,8 +399,8 @@ fun ApplicationPortalViewContent(
                                                     }
                                                 },
                                                 colors = ButtonDefaults.outlinedButtonColors(
-                                                    containerColor = if(isApplied)MaterialTheme.colorScheme.onSecondary
-                                                                        else MaterialTheme.colorScheme.primaryContainer,
+                                                    containerColor = if (isApplied) MaterialTheme.colorScheme.onSecondary
+                                                    else MaterialTheme.colorScheme.primaryContainer,
                                                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                                 ),
                                                 border = BorderStroke(
@@ -406,17 +408,22 @@ fun ApplicationPortalViewContent(
                                                     MaterialTheme.colorScheme.onPrimaryContainer
                                                 )
                                             ) {
-                                                when(state){
+                                                when (state) {
                                                     is ApplyState.Error -> {
-                                                        Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(
+                                                            context,
+                                                            state.message,
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
                                                         applicationPortalViewModel.resetApplyState(
                                                             batchData?.docId ?: ""
                                                         )
                                                     }
+
                                                     ApplyState.Idle -> {
                                                         Text(
                                                             textAlign = TextAlign.Center,
-                                                            text = if(isApplied)"Status" else "Apply",
+                                                            text = if (isApplied) "Status" else "Apply",
                                                             style = TextStyle(
                                                                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                                                                 fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
@@ -424,6 +431,7 @@ fun ApplicationPortalViewContent(
                                                             )
                                                         )
                                                     }
+
                                                     ApplyState.Loading -> {
                                                         CircularProgressIndicator(
                                                             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -431,15 +439,15 @@ fun ApplicationPortalViewContent(
                                                             strokeWidth = 4.dp
                                                         )
                                                     }
+
                                                     is ApplyState.Success -> {
-                                                        if(state.isApplied) {
+                                                        if (state.isApplied) {
                                                             Toast.makeText(
                                                                 context,
                                                                 state.message,
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
-                                                        }
-                                                        else{
+                                                        } else {
                                                             Toast.makeText(
                                                                 context,
                                                                 state.message,
@@ -462,7 +470,7 @@ fun ApplicationPortalViewContent(
             }
         }
     }
-    if(bottomSheetParams!=null){
+    if (bottomSheetParams != null) {
         ModalBottomSheet(
             modifier = Modifier.fillMaxWidth(),
             sheetState = bottomSheetState,
@@ -475,7 +483,7 @@ fun ApplicationPortalViewContent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
-        ){
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -495,7 +503,7 @@ fun ApplicationPortalViewContent(
             }
         }
     }
-    if(detailsBottomSheetParams!=null){
+    if (detailsBottomSheetParams != null) {
         ModalBottomSheet(
             modifier = Modifier.fillMaxWidth(),
             sheetState = detailsBottomSheetState,
@@ -529,7 +537,10 @@ fun ApplicationPortalViewContent(
 }
 
 @Composable
-private fun BottomSheetDesign(bottomSheetParams: BottomSheetParams, applicationPortalViewModel: ApplicationPortalViewModel){
+private fun BottomSheetDesign(
+    bottomSheetParams: BottomSheetParams,
+    applicationPortalViewModel: ApplicationPortalViewModel
+) {
     Log.d("bottomSheetParams", bottomSheetParams.toString())
     val batchData = bottomSheetParams.batchData
     val studentData = bottomSheetParams.studentData
@@ -538,7 +549,7 @@ private fun BottomSheetDesign(bottomSheetParams: BottomSheetParams, applicationP
 //    val appliedDate by applicationPortalViewModel.appliedDate.observeAsState()
     val applicationData by applicationPortalViewModel.applicationData.observeAsState()
 
-    LaunchedEffect(bottomSheetParams){
+    LaunchedEffect(bottomSheetParams) {
         applicationPortalViewModel.getApplicationData(batchData.docId, studentData.uId)
     }
 
@@ -563,7 +574,8 @@ private fun BottomSheetDesign(bottomSheetParams: BottomSheetParams, applicationP
                 statusContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 statusContainerColor = MaterialTheme.colorScheme.onSecondary
                 statusBorderColor = MaterialTheme.colorScheme.onSecondaryContainer
-                statusContent = "Your application has been shortlisted And you're currently in interview process"
+                statusContent =
+                    "Your application has been shortlisted And you're currently in interview process"
             } else if (processId.toInt() == 3) {
                 statusContentColor = MaterialTheme.colorScheme.success
                 statusContainerColor = MaterialTheme.colorScheme.successContainer
@@ -737,9 +749,9 @@ private fun BottomSheetDesign(bottomSheetParams: BottomSheetParams, applicationP
                         totalSteps = 4,
                         currentStep = if (processId > 3) {
                             processId - 5
-                        } else if(processId.toInt() == 3){
+                        } else if (processId.toInt() == 3) {
                             4
-                        }else{
+                        } else {
                             processId
                         },
                         icons = listOf(
@@ -807,10 +819,11 @@ private fun BottomSheetDesign(bottomSheetParams: BottomSheetParams, applicationP
 @Composable
 private fun DetailsBottomSheetDesign(
     bottomSheetParams: BottomSheetParams
-){
+) {
     val batchData = bottomSheetParams.batchData
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(bottom = 5.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterVertically)
     ) {
@@ -823,7 +836,8 @@ private fun DetailsBottomSheetDesign(
             )
         )
         ElevatedCard(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(0.dp),
 //            colors = CardDefaults.cardColors(
 //                containerColor = MaterialTheme.colorScheme.onSecondary,
@@ -832,10 +846,16 @@ private fun DetailsBottomSheetDesign(
         ) {
             Column(
                 modifier = Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterVertically)
+                verticalArrangement = Arrangement.spacedBy(
+                    10.dp,
+                    alignment = Alignment.CenterVertically
+                )
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -854,7 +874,10 @@ private fun DetailsBottomSheetDesign(
                     )
                 }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -873,7 +896,10 @@ private fun DetailsBottomSheetDesign(
                     )
                 }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -883,7 +909,7 @@ private fun DetailsBottomSheetDesign(
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = "Duration "+UtilityFunctions.convertMillisToDate(batchData.startDate)+" to "+
+                        text = "Duration " + UtilityFunctions.convertMillisToDate(batchData.startDate) + " to " +
                                 UtilityFunctions.convertMillisToDate(batchData.endDate),
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.titleSmall.fontSize,
@@ -903,10 +929,16 @@ private fun DetailsBottomSheetDesign(
         ) {
             Column(
                 modifier = Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterVertically)
+                verticalArrangement = Arrangement.spacedBy(
+                    10.dp,
+                    alignment = Alignment.CenterVertically
+                )
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -916,7 +948,7 @@ private fun DetailsBottomSheetDesign(
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = "Posted at "+UtilityFunctions.convertMillisToDate(
+                        text = "Posted at " + UtilityFunctions.convertMillisToDate(
                             batchData.createdAt
                         ),
                         style = TextStyle(
@@ -927,7 +959,10 @@ private fun DetailsBottomSheetDesign(
                     )
                 }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -937,7 +972,7 @@ private fun DetailsBottomSheetDesign(
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text ="Interview Date "+ UtilityFunctions.convertMillisToDate(batchData.interviewDate),
+                        text = "Interview Date " + UtilityFunctions.convertMillisToDate(batchData.interviewDate),
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
@@ -946,7 +981,10 @@ private fun DetailsBottomSheetDesign(
                     )
                 }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        10.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -976,11 +1014,17 @@ private fun DetailsBottomSheetDesign(
         ) {
             Column(
                 modifier = Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterVertically)
+                verticalArrangement = Arrangement.spacedBy(
+                    10.dp,
+                    alignment = Alignment.CenterVertically
+                )
             ) {
                 Column(
                     modifier = Modifier.padding(0.dp),
-                    verticalArrangement = Arrangement.spacedBy(5.dp, alignment = Alignment.CenterVertically)
+                    verticalArrangement = Arrangement.spacedBy(
+                        5.dp,
+                        alignment = Alignment.CenterVertically
+                    )
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(
@@ -1017,7 +1061,10 @@ private fun DetailsBottomSheetDesign(
                 }
                 Column(
                     modifier = Modifier.padding(0.dp),
-                    verticalArrangement = Arrangement.spacedBy(5.dp, alignment = Alignment.CenterVertically)
+                    verticalArrangement = Arrangement.spacedBy(
+                        5.dp,
+                        alignment = Alignment.CenterVertically
+                    )
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(
@@ -1044,10 +1091,13 @@ private fun DetailsBottomSheetDesign(
                     LazyRow(
                         modifier = Modifier
                             .padding(start = 30.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            10.dp,
+                            Alignment.CenterHorizontally
+                        ),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        items(batchData.skills) {skill ->
+                        items(batchData.skills) { skill ->
                             OutlinedCard(
                                 modifier = Modifier
                                     .wrapContentWidth()
@@ -1092,7 +1142,7 @@ private fun DetailsBottomSheetDesign(
 
 @Preview(showBackground = true)
 @Composable
-fun DetailsBottomSheetDesignPreview(){
+fun DetailsBottomSheetDesignPreview() {
     KarkaBoardTheme {
         DetailsBottomSheetDesign(
             bottomSheetParams = BottomSheetParams(

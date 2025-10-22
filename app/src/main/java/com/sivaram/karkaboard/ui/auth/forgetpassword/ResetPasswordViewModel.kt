@@ -13,15 +13,15 @@ import javax.inject.Inject
 class ResetPasswordViewModel @Inject constructor(
     private val repository: AuthRepository
 ): ViewModel() {
-    fun resetPassword(newPassword: String, context: Context, onResult: (Boolean) -> Unit) {
+    fun resetPassword(newPassword: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            repository.resetPassword(newPassword, context, onResult)
+            repository.resetPassword(newPassword, onResult)
         }
     }
 
-    fun signOut(context: Context) {
+    fun signOut() {
         viewModelScope.launch {
-            repository.signOut(context)
+            repository.signOut()
         }
     }
 

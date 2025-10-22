@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.sivaram.karkaboard.appconstants.DbConstants
 import com.sivaram.karkaboard.data.dto.ApplicationData
+import com.sivaram.karkaboard.data.dto.InterviewHistoryData
 import com.sivaram.karkaboard.data.dto.ApplicationPortalData
 import com.sivaram.karkaboard.data.dto.AppliedStudentData
 import com.sivaram.karkaboard.data.dto.BatchData
@@ -329,5 +329,47 @@ class DatabaseRepositoryImpl : DatabaseRepository {
         } catch (e: Exception) {
             ApplicationState.Error(e.localizedMessage ?: "Check failed")
         }
+    }
+
+    override suspend fun getInterviewHistory(studentId: String): LiveData<List<InterviewHistoryData>> {
+        Log.d("LogData", "studentId -> $studentId")
+        val interviewHistory = MutableLiveData<List<InterviewHistoryData>>()
+        try{
+            firebaseFireStore.collection("applications")
+                .whereEqualTo("studentId", studentId)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null || snapshot==null) {
+                        return@addSnapshotListener
+                    }
+                    Log.d("LogData", "getInterviewHistory() -> ${snapshot.documents}")
+                    val result = mutableListOf<InterviewHistoryData>()
+                    snapshot.documents.forEach { appDoc ->
+                        val appObj = appDoc.toObject(ApplicationData::class.java)
+                        appObj?.let { applicationData ->
+                            firebaseFireStore.collection("batches")
+                                .document(applicationData.batchId).get()
+                                .addOnSuccessListener { batchDoc ->
+                                    val batchObj = batchDoc.toObject(BatchData::class.java)
+                                    Log.d("LogData", "getInterviewHistory() AppObj -> $appObj")
+                                    Log.d("LogData", "getInterviewHistory() BatchObj -> $batchObj")
+                                    if (batchObj != null) {
+                                        result.add(
+                                            InterviewHistoryData(
+                                                applicationData = appObj,
+                                                batchData = batchObj
+                                            )
+                                        )
+                                        interviewHistory.value = result
+                                    }
+                                }
+                        }
+                    }
+                }
+        }
+        catch (e: Exception){
+            interviewHistory.value = emptyList()
+        }
+        Log.d("LogData", "getInterviewHistory() -> ${interviewHistory.value}")
+        return interviewHistory
     }
 }

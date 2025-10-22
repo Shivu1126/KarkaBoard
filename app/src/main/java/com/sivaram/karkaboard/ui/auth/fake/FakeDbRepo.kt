@@ -6,6 +6,7 @@ import com.sivaram.karkaboard.data.dto.ApplicationData
 import com.sivaram.karkaboard.data.dto.ApplicationPortalData
 import com.sivaram.karkaboard.data.dto.AppliedStudentData
 import com.sivaram.karkaboard.data.dto.BatchData
+import com.sivaram.karkaboard.data.dto.InterviewHistoryData
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StudentData
 import com.sivaram.karkaboard.data.dto.UserData
@@ -61,5 +62,9 @@ class FakeDbRepo: DatabaseRepository {
         applicationData: ApplicationData
     ): ApplicationState {
         return ApplicationState.Idle
+    }
+
+    override suspend fun getInterviewHistory(studentId: String): LiveData<List<InterviewHistoryData>> {
+        return MutableLiveData(emptyList())
     }
 }
