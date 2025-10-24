@@ -31,14 +31,14 @@
 
 ---
 
-## 🌱 Why “Karka”?
+## Why “Karka”?
 
 > “**Karka**” (கற்க) is a Tamil word that means **“to learn.”**  
 > The name **KarkaBoard** symbolizes a smart digital space where students can **learn, grow, and track their progress seamlessly** — reflecting the project’s mission to build an intelligent and transparent learning ecosystem.
 
 ---
 
-## 🚀 About The Project
+## About The Project
 
 **KarkaBoard** is an Android-based system that simplifies how institutions manage **student registration, training, interviews, and performance**.  
 It bridges communication between **Students, Faculties, Mentors, HR, Admins, and Interview Panelists** — ensuring a smooth workflow from onboarding to placement.
@@ -47,7 +47,7 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-## 🪶 Table of Contents
+## Table of Contents
 
 - [About The Project](#-about-the-project)
 - [Key Features](#-key-features)
@@ -62,9 +62,9 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 👨‍🎓 Student Module
+### Student Module
 - Register & Login with resume upload
 - View and apply for training batches
 - Track applications and interview progress
@@ -80,7 +80,7 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-### 👩‍🏫 Faculty / In-Charge / Mentor Module
+### Faculty / In-Charge / Mentor Module
 - Assign and validate tasks for students
 - Shortlist applied candidates
 - Conduct and schedule training sessions
@@ -94,7 +94,7 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-### 🧑‍💼 HR Module
+### HR Module
 - View shortlisted and selected candidates
 - Manage onboarding documents and approvals
 - Track attendance and performance data
@@ -105,7 +105,7 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-### 🧑‍⚖️ Admin Module
+### Admin Module
 - Add or remove Faculty, HR, Panelists, and Admins
 - Send credentials automatically via email
 - Manage the Application & Interview portals
@@ -116,7 +116,7 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-### 🧑‍💻 Interview Panelist Module
+### Interview Panelist Module
 - View only assigned candidates
 - Update student performance after each round
 - Add feedback, question count, and round status
@@ -124,7 +124,13 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-## 🛠️ Tech Stack
+## Screenshots
+
+<img width="1920" height="1080" alt="Karka Board UI (1)" src="https://github.com/user-attachments/assets/1abdb7c0-8d6c-495f-9cfa-0cab1cf5ba1e" />
+
+---
+
+## Tech Stack
 
 | Layer | Technologies |
 |-------|---------------|
@@ -139,7 +145,7 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-## 🧩 App Architecture
+## App Architecture
 
 - **MVVM (Model-View-ViewModel)** pattern  
 - **Firestore** for cloud storage  
@@ -148,9 +154,9 @@ It’s designed for real-time transparency, accountability, and progress trackin
 
 ---
 
-## 📬 Contact
+## Contact
 
-👨‍💻 **Developer:** *Sivaram (Shivv)*  
+**Developer:** *Sivaram (Shivv)*  
 <br>
 <img src="https://img.shields.io/badge/Email-D14836?style=flat&logo=gmail&logoColor=white" alt="Email" height="20"/> [siva11vkavis@gmail.com](mailto:siva11vkavis@gmail.com)  
 <br>
