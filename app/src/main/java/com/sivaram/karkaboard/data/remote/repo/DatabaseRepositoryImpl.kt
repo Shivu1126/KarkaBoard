@@ -296,7 +296,10 @@ class DatabaseRepositoryImpl : DatabaseRepository {
                     "selectedCount", batchObj?.selectedCount?.plus(1)
                 ).await()
             firebaseFireStore.collection(DbConstants.STUDENT_TABLE).document(studentDocId).update(
-                "selected", true
+                mapOf(
+                    "selected" to true,
+                    "batchId" to applicationData.batchId
+                )
             ).await()
             ApplicationState.Success("Success", true)
         } catch (e: Exception) {

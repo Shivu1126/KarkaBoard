@@ -15,6 +15,7 @@ import com.sivaram.karkaboard.ui.home.HomeView
 import com.sivaram.karkaboard.ui.auth.login.LoginView
 import com.sivaram.karkaboard.ui.auth.register.RegisterView
 import com.sivaram.karkaboard.ui.base.BaseView
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.TaskManagementView
 import com.sivaram.karkaboard.ui.interviewhistory.InterviewHistoryView
 import com.sivaram.karkaboard.ui.interviewmanagement.InterviewManagementView
 import com.sivaram.karkaboard.ui.managebatches.ManageBatchesView
@@ -88,6 +89,9 @@ fun Navigation( navController: NavHostController, context: Context){
         }
         composable(NavConstants.CHANGE_PASSWORD) {
             ChangePasswordView(navController, context)
+        }
+        composable(NavConstants.TASK_MANAGEMENT) {
+            TaskManagementView(navController, context)
         }
     }
 }

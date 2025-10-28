@@ -141,8 +141,8 @@ fun ManageStaffsView(navController: NavController, context: Context, manageStaff
                 onClick = {
                     navController.navigate(NavConstants.ADD_STAFF)
                 },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.secondaryContainer
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(Icons.Filled.Add, "Small floating action button.")
             }

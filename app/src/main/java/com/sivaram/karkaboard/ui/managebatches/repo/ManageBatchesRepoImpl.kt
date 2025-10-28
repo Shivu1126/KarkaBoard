@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.sivaram.karkaboard.appconstants.DbConstants
 import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.ui.managebatches.state.CreateBatchState
+import com.sivaram.karkaboard.ui.managebatches.state.EndBatchState
 import kotlinx.coroutines.tasks.await
 
 class ManageBatchesRepoImpl : ManageBatchesRepo {
@@ -37,6 +38,16 @@ class ManageBatchesRepoImpl : ManageBatchesRepo {
             onResult(true)
         }catch (e: Exception){
             onResult(false)
+        }
+    }
+
+    override suspend fun endBatch(batchId: String): EndBatchState {
+        return try{
+            firebaseFireStore.collection(DbConstants.BATCHES_TABLE).document(batchId)
+                .update("end", true).await()
+            EndBatchState.Success("Batch ended successfully")
+        }catch (e: Exception){
+            EndBatchState.Error("Something went wrong")
         }
     }
 }

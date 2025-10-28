@@ -11,6 +11,7 @@ data class BatchData (
     var createdBy: String = "", //admin id
     var createdAt: Long = 0,
     var isOpen: Boolean = true,
+    var isEnd: Boolean = false,
     var interviewLocation: String = "",
     var interviewDate: Long = 0,
     var appliedCount: Int = 0,

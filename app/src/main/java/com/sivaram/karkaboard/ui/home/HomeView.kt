@@ -305,54 +305,6 @@ fun HomeViewContent(
                                     }
                                 }
                             }
-                            item {//All student
-                                OutlinedCard(
-                                    modifier = Modifier
-                                        .aspectRatio(1f),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ),
-                                    border = BorderStroke(
-                                        3.dp,
-                                        MaterialTheme.colorScheme.onPrimaryContainer
-                                    ),
-                                    elevation = CardDefaults.cardElevation(
-                                        defaultElevation = 10.dp
-                                    ),
-                                    shape = RoundedCornerShape(25.dp),
-                                    onClick = {
-
-                                    }
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-
-                                        ) {
-                                        Icon(
-                                            modifier = Modifier.size(40.dp),
-                                            painter = painterResource(R.drawable.ic_students),
-                                            contentDescription = "Students"
-                                        )
-                                        Text(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(5.dp),
-                                            text = "All Students",
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                            style = TextStyle(
-                                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
-                                                fontFamily = overpassMonoBold
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
-                            }
                         }
                         if(role==OtherConstants.STUDENT ){
                             if(studentData?.isSelected!=true) {
@@ -493,6 +445,56 @@ fun HomeViewContent(
                                                 .fillMaxWidth()
                                                 .padding(5.dp),
                                             text = "Interview Management",
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis,
+                                            style = TextStyle(
+                                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                                                fontFamily = overpassMonoBold
+                                            ),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        if(role==OtherConstants.FACULTY){
+                            item {//interview process
+                                OutlinedCard(
+                                    modifier = Modifier
+                                        .aspectRatio(1f),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    border = BorderStroke(
+                                        3.dp,
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    elevation = CardDefaults.cardElevation(
+                                        defaultElevation = 10.dp
+                                    ),
+                                    shape = RoundedCornerShape(25.dp),
+                                    onClick = {
+
+                                    }
+                                ) {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+
+                                        ) {
+                                        Icon(
+                                            modifier = Modifier.size(40.dp),
+                                            painter = painterResource(R.drawable.ic_task_management),
+                                            contentDescription = "Task_management"
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(5.dp),
+                                            text = "Task Management",
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis,
                                             style = TextStyle(

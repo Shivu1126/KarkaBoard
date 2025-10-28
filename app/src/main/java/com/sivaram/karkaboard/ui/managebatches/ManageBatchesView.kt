@@ -24,12 +24,14 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -65,9 +67,12 @@ import com.sivaram.karkaboard.data.local.RolePrefs
 import com.sivaram.karkaboard.ui.auth.fake.FakeDbRepo
 import com.sivaram.karkaboard.ui.auth.fake.FakeManageBatchesRepo
 import com.sivaram.karkaboard.ui.base.BaseView
+import com.sivaram.karkaboard.ui.managebatches.state.EndBatchState
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
 import com.sivaram.karkaboard.ui.theme.overpassMonoBold
 import com.sivaram.karkaboard.ui.theme.overpassMonoMedium
+import com.sivaram.karkaboard.ui.theme.success
+import com.sivaram.karkaboard.ui.theme.successContainer
 import com.sivaram.karkaboard.utils.UtilityFunctions
 import kotlinx.coroutines.launch
 
@@ -146,8 +151,8 @@ fun ManageBatchesView(
                     onClick = {
                         navController.navigate(NavConstants.CREATE_NEW_BATCH)
                     },
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.secondaryContainer
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     Icon(Icons.Filled.Add, "Add New Batches")
                 }
@@ -178,6 +183,9 @@ fun ManageBatchesViewContent(
             getAllBatches()
         }
     }
+
+    val endBatchStates by manageBatchesViewModel.endBatchState.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -218,8 +226,10 @@ fun ManageBatchesViewContent(
 
 
                     allBatchesData?.forEach { batchData ->
-
                         item {
+
+                            val endBatchState = endBatchStates[batchData.docId] ?: EndBatchState.Idle
+
                             OutlinedCard(
                                 modifier = Modifier
                                     .height(150.dp),
@@ -271,13 +281,19 @@ fun ManageBatchesViewContent(
 
                                         if (batchData.isOpen) {
                                             if (role == OtherConstants.ADMIN) {
-                                                Button(
+                                                OutlinedButton(
                                                     modifier = Modifier
                                                         .wrapContentWidth()
                                                         .padding(start = 15.dp),
                                                     colors = ButtonDefaults.buttonColors(
                                                         containerColor = MaterialTheme.colorScheme.errorContainer,
-                                                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                                                        disabledContainerColor = MaterialTheme.colorScheme.errorContainer.copy(
+                                                            alpha = 0.5f
+                                                        ),
+                                                        disabledContentColor = MaterialTheme.colorScheme.onErrorContainer.copy(
+                                                            alpha = 0.5f
+                                                        )
                                                     ),
                                                     onClick = {
                                                         manageBatchesViewModel.closeBatchPortal(batchData.docId){ isClosed ->
@@ -305,23 +321,95 @@ fun ManageBatchesViewContent(
                                                         ),
                                                     )
                                                 }
-                                            } else {
+                                            }
+                                            else {
                                                 Text(
                                                     textAlign = TextAlign.Center,
-                                                    text = "Open",
+                                                    text = "Interview",
                                                     style = TextStyle(
                                                         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                                                         fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
                                                         fontFamily = overpassMonoMedium
                                                     ),
-                                                    color = Color.Green
+                                                    color = MaterialTheme.colorScheme.success
+                                                )
+                                            }
+                                        }
+                                        else if(!batchData.isEnd){
+                                            if (role == OtherConstants.ADMIN) {
+                                                OutlinedButton(
+                                                    enabled = endBatchState !is EndBatchState.Loading,
+                                                    modifier = Modifier
+                                                        .wrapContentWidth()
+                                                        .padding(start = 15.dp),
+                                                    colors = ButtonDefaults.outlinedButtonColors(
+                                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                        disabledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(
+                                                            alpha = 0.5f
+                                                        ),
+                                                        disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                            alpha = 0.5f
+                                                        )
+                                                    ),
+                                                    onClick = {
+                                                        manageBatchesViewModel.endBatch(batchData.docId)
+                                                    },
+                                                    shape = RoundedCornerShape(10.dp),
+                                                    border = BorderStroke(
+                                                        1.dp,
+                                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                                    )
+                                                ) {
+                                                    when(endBatchState){
+                                                        is EndBatchState.Error ->
+                                                            Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
+                                                        EndBatchState.Idle -> {
+                                                            Text(
+                                                                textAlign = TextAlign.Center,
+                                                                text = "End Batch",
+                                                                style = TextStyle(
+                                                                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                                                                    fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
+                                                                    fontFamily = overpassMonoMedium
+                                                                ),
+                                                            )
+                                                        }
+                                                        EndBatchState.Loading ->
+                                                            CircularProgressIndicator(
+                                                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                                    alpha = 0.5f
+                                                                ),
+                                                                modifier = Modifier.size(
+                                                                    20.dp
+                                                                ),
+                                                                strokeWidth = 4.dp
+                                                            )
+                                                        is EndBatchState.Success -> {
+                                                            Toast.makeText(context, "Batch ended successfully", Toast.LENGTH_SHORT).show()
+                                                            manageBatchesViewModel.resetEndBatchState(batchData.docId)
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                            else {
+                                                Text(
+                                                    textAlign = TextAlign.Center,
+                                                    text = "Interning",
+                                                    style = TextStyle(
+                                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                                        fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
+                                                        fontFamily = overpassMonoMedium
+                                                    ),
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer
                                                 )
                                             }
                                         }
                                         else {
                                             Text(
                                                 textAlign = TextAlign.Center,
-                                                text = "Closed",
+                                                text = "Batch Ended",
                                                 style = TextStyle(
                                                     fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                                                     fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
@@ -374,7 +462,7 @@ fun ManageBatchesViewContent(
                                                     fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
                                                     fontFamily = overpassMonoMedium
                                                 ),
-                                                color = Color.Green
+                                                color = MaterialTheme.colorScheme.success
                                             )
                                             Text(
                                                 text = "Selected",
@@ -383,7 +471,7 @@ fun ManageBatchesViewContent(
                                                     fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
                                                     fontFamily = overpassMonoMedium
                                                 ),
-                                                color = Color.Green
+                                                color = MaterialTheme.colorScheme.success
                                             )
                                         }
                                         Column(
