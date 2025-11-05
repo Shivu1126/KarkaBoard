@@ -6,7 +6,7 @@ data class TaskData(
     var facultyId: String = "",
     var title: String = "",
     var description: String = "",
-    var question: List<String> = emptyList(),
+    var questions: List<String> = emptyList(),
     var tags: List<String> = emptyList(),
     var assignedDate: Long = 0,
     var dueDate: Long = 0,

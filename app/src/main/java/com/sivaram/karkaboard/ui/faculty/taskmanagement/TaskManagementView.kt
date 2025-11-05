@@ -63,7 +63,7 @@ fun TaskManagementView(
                 title = {
                     Text(
                         modifier = Modifier.padding(start = 15.dp),
-                        text = "All Batches",
+                        text = "Task Management",
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.titleLarge.fontSize,
                             fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
@@ -108,7 +108,7 @@ fun TaskManagementView(
                     .size(60.dp)
                     .align(Alignment.BottomEnd),
                 onClick = {
-
+                    navController.navigate(NavConstants.ASSIGN_TASK)
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary

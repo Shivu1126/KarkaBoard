@@ -476,7 +476,7 @@ fun HomeViewContent(
                                     ),
                                     shape = RoundedCornerShape(25.dp),
                                     onClick = {
-
+                                        navController.navigate(NavConstants.TASK_MANAGEMENT)
                                     }
                                 ) {
                                     Column(

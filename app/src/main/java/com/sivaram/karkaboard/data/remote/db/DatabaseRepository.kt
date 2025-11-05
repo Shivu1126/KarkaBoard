@@ -8,7 +8,9 @@ import com.sivaram.karkaboard.data.dto.AppliedStudentData
 import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StudentData
+import com.sivaram.karkaboard.data.dto.TaskData
 import com.sivaram.karkaboard.data.dto.UserData
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.AssignTaskState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
@@ -25,4 +27,6 @@ interface DatabaseRepository {
     suspend fun selectedForTraining(applicationData: ApplicationData, studentDocId: String): ApplicationState
     suspend fun rejectedFromInterview(applicationData: ApplicationData): ApplicationState
     suspend fun getInterviewHistory(studentId: String): LiveData<List<InterviewHistoryData>>
+    suspend fun getAvailableBatches(): LiveData<List<BatchData>>
+    suspend fun assignTask(taskData: TaskData): AssignTaskState
 }

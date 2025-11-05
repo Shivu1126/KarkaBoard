@@ -553,7 +553,7 @@ fun CreateNewBatchViewContent(
                                     Icon(
                                         modifier = Modifier.size(25.dp),
                                         painter = painterResource(R.drawable.ic_skill),
-                                        contentDescription = "Password Icon"
+                                        contentDescription = "Skill Icon"
                                     )
                                     BasicTextField(
                                         value = skill,
@@ -723,10 +723,14 @@ fun CreateNewBatchViewContent(
                                 )
                             )
                             if (showInterviewDatePicker) {
-                                InterviewDatePickerModal(
+                                UtilityFunctions.DatePickerModal(
                                     onDateSelected = { interviewDate = it },
                                     onDismiss = { showInterviewDatePicker = false }
                                 )
+//                                InterviewDatePickerModal(
+//                                    onDateSelected = { interviewDate = it },
+//                                    onDismiss = { showInterviewDatePicker = false }
+//                                )
                             }
                         }
                     }

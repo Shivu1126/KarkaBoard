@@ -9,8 +9,10 @@ import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.InterviewHistoryData
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StudentData
+import com.sivaram.karkaboard.data.dto.TaskData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.AssignTaskState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
@@ -66,5 +68,13 @@ class FakeDbRepo: DatabaseRepository {
 
     override suspend fun getInterviewHistory(studentId: String): LiveData<List<InterviewHistoryData>> {
         return MutableLiveData(emptyList())
+    }
+
+    override suspend fun getAvailableBatches(): LiveData<List<BatchData>> {
+        return MutableLiveData(emptyList())
+    }
+
+    override suspend fun assignTask(taskData: TaskData): AssignTaskState {
+        return AssignTaskState.Idle
     }
 }

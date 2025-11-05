@@ -16,6 +16,7 @@ import com.sivaram.karkaboard.ui.auth.login.LoginView
 import com.sivaram.karkaboard.ui.auth.register.RegisterView
 import com.sivaram.karkaboard.ui.base.BaseView
 import com.sivaram.karkaboard.ui.faculty.taskmanagement.TaskManagementView
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.assigntask.AssignTaskView
 import com.sivaram.karkaboard.ui.interviewhistory.InterviewHistoryView
 import com.sivaram.karkaboard.ui.interviewmanagement.InterviewManagementView
 import com.sivaram.karkaboard.ui.managebatches.ManageBatchesView
@@ -92,6 +93,9 @@ fun Navigation( navController: NavHostController, context: Context){
         }
         composable(NavConstants.TASK_MANAGEMENT) {
             TaskManagementView(navController, context)
+        }
+        composable(NavConstants.ASSIGN_TASK) {
+            AssignTaskView(navController, context)
         }
     }
 }

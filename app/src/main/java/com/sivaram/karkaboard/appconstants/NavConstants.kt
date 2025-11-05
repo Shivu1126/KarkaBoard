@@ -16,4 +16,5 @@ object NavConstants {
     const val INTERVIEW_HISTORY = "interview_history"
     const val CHANGE_PASSWORD = "change_password"
     const val TASK_MANAGEMENT = "task_management"
+    const val ASSIGN_TASK = "assign task"
 }

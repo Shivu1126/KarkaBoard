@@ -14,8 +14,10 @@ import com.sivaram.karkaboard.data.dto.AppliedStudentData
 import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StudentData
+import com.sivaram.karkaboard.data.dto.TaskData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.AssignTaskState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
@@ -374,5 +376,42 @@ class DatabaseRepositoryImpl : DatabaseRepository {
         }
         Log.d("LogData", "getInterviewHistory() -> ${interviewHistory.value}")
         return interviewHistory
+    }
+
+    override suspend fun getAvailableBatches(): LiveData<List<BatchData>> {
+        val batchesData = MutableLiveData<List<BatchData>>(emptyList())
+        try {
+            firebaseFireStore.collection(DbConstants.BATCHES_TABLE)
+                .whereEqualTo("end",false)
+                .whereEqualTo("open",false)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val batchList =
+                            snapshot.documents.mapNotNull { it.toObject(BatchData::class.java) }
+                        Log.d("DatabaseRepositoryImpl", "getAllBatches: $batchList")
+                        batchesData.value = batchList
+                    }
+                }
+        } catch (e: Exception) {
+            batchesData.value = emptyList()
+        }
+        return batchesData
+    }
+
+    override suspend fun assignTask(taskData: TaskData): AssignTaskState {
+        return try{
+            taskData.assignedDate = System.currentTimeMillis()
+            val taskDoc = firebaseFireStore.collection(DbConstants.TASKS_TABLE).document()
+            taskData.taskId = taskDoc.id
+            taskDoc.set(taskData).await()
+
+            AssignTaskState.Success("Task assigned successfully.")
+        }
+        catch (e: Exception){
+            AssignTaskState.Error("Something went wrong")
+        }
     }
 }
