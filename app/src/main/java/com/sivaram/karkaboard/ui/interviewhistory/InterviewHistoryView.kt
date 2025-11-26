@@ -287,7 +287,7 @@ private fun HistoryContentCard(
         status = "Rejected"
     }
     ElevatedCard(
-        modifier = modifier,
+        modifier = modifier.padding(vertical = 10.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,

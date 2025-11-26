@@ -21,6 +21,12 @@ object UtilityFunctions {
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return formatter.format(Date(millis))
     }
+
+    fun convertMillisToDateMonthFormat(millis: Long): String{
+        val formatter = SimpleDateFormat("dd MMM,yyyy", Locale.getDefault())
+        return formatter.format(Date(millis))
+    }
+
     fun getFileName(context: Context, uri: Uri): String? {
         val cursor = context.contentResolver.query(uri, null, null, null, null)
         val nameIndex = cursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)

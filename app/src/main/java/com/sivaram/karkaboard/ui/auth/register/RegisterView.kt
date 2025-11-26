@@ -165,9 +165,9 @@ fun RegisterViewContent(
     var resumeFileName by rememberSaveable { mutableStateOf("") }
     var resumeUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
-    val documentLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri: Uri? ->
+        val documentLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument()
+        ) { uri: Uri? ->
         uri?.let {
             try {
                 context.contentResolver.takePersistableUriPermission(

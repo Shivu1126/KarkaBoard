@@ -7,13 +7,17 @@ import com.sivaram.karkaboard.data.dto.ApplicationPortalData
 import com.sivaram.karkaboard.data.dto.AppliedStudentData
 import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.RolesData
+import com.sivaram.karkaboard.data.dto.StaffData
 import com.sivaram.karkaboard.data.dto.StudentData
 import com.sivaram.karkaboard.data.dto.TaskData
+import com.sivaram.karkaboard.data.dto.TaskSubmissionData
+import com.sivaram.karkaboard.data.dto.TaskViewData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.AssignTaskState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
+import com.sivaram.karkaboard.ui.student.state.SubmitTaskState
 
 interface DatabaseRepository {
     fun getRoles(): LiveData<List<RolesData>>
@@ -29,4 +33,11 @@ interface DatabaseRepository {
     suspend fun getInterviewHistory(studentId: String): LiveData<List<InterviewHistoryData>>
     suspend fun getAvailableBatches(): LiveData<List<BatchData>>
     suspend fun assignTask(taskData: TaskData): AssignTaskState
+    suspend fun getAssignedTasksByFaculty(batchId: String, userId: String): LiveData<List<TaskData>>
+    suspend fun getTaskByBatch(studentId: String, batchId: String, status: String): LiveData<List<TaskViewData>>
+
+    suspend fun getTaskById(taskId: String): LiveData<TaskData?>
+    suspend fun getTaskSubmissionById(taskSubmissionId: String): LiveData<TaskSubmissionData?>
+    suspend fun getFacultyById(facultyId: String): LiveData<StaffData?>
+    suspend fun updateSubmissionData(taskSubmissionData: TaskSubmissionData): SubmitTaskState
 }

@@ -7,6 +7,7 @@ data class TaskData(
     var title: String = "",
     var description: String = "",
     var questions: List<String> = emptyList(),
+    var attachmentUrl: String = "",
     var tags: List<String> = emptyList(),
     var assignedDate: Long = 0,
     var dueDate: Long = 0,

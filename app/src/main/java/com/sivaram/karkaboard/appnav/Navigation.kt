@@ -17,6 +17,7 @@ import com.sivaram.karkaboard.ui.auth.register.RegisterView
 import com.sivaram.karkaboard.ui.base.BaseView
 import com.sivaram.karkaboard.ui.faculty.taskmanagement.TaskManagementView
 import com.sivaram.karkaboard.ui.faculty.taskmanagement.assigntask.AssignTaskView
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.taskdetails.TaskDetailsView
 import com.sivaram.karkaboard.ui.interviewhistory.InterviewHistoryView
 import com.sivaram.karkaboard.ui.interviewmanagement.InterviewManagementView
 import com.sivaram.karkaboard.ui.managebatches.ManageBatchesView
@@ -24,6 +25,8 @@ import com.sivaram.karkaboard.ui.managebatches.createnewbatch.CreateNewBatchView
 import com.sivaram.karkaboard.ui.managestaffs.ManageStaffsView
 import com.sivaram.karkaboard.ui.managestaffs.addstaff.AddStaffView
 import com.sivaram.karkaboard.ui.managestaffs.staffprofile.StaffProfileView
+import com.sivaram.karkaboard.ui.student.task.TaskView
+import com.sivaram.karkaboard.ui.student.task.tasksubmission.TaskSubmissionView
 
 @Composable
 fun Navigation( navController: NavHostController, context: Context){
@@ -96,6 +99,35 @@ fun Navigation( navController: NavHostController, context: Context){
         }
         composable(NavConstants.ASSIGN_TASK) {
             AssignTaskView(navController, context)
+        }
+        composable(NavConstants.TASK) {
+            TaskView(navController, context)
+        }
+        composable(
+            route = NavConstants.TASK_SUBMISSION + "/{taskId}/{taskSubmissionId}/{facultyId}",
+            arguments = listOf(
+                navArgument("taskId") { type = NavType.StringType },
+                navArgument("taskSubmissionId") { type = NavType.StringType },
+                navArgument("facultyId") { type = NavType.StringType }
+            )
+        ){backStackEntry ->
+            val taskId = backStackEntry.arguments?.getString("taskId")?:""
+            val taskSubmissionId = backStackEntry.arguments?.getString("taskSubmissionId")?:""
+            val facultyId = backStackEntry.arguments?.getString("facultyId")?:""
+            TaskSubmissionView(
+                taskId, taskSubmissionId, facultyId, navController, context
+            )
+        }
+        composable(
+            route = NavConstants.TASK_DETAILS+"/{taskId}/{batchId}",
+            arguments = listOf(
+                navArgument("taskId") { type = NavType.StringType },
+                navArgument("batchId") { type = NavType.StringType }
+            )
+        ){ backStackEntry ->
+            val taskId = backStackEntry.arguments?.getString("taskId")?:""
+            val batchId = backStackEntry.arguments?.getString("batchId")?:""
+            TaskDetailsView(taskId, batchId, navController, context)
         }
     }
 }

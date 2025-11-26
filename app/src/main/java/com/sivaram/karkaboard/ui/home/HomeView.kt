@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.fillMaxSize
@@ -128,7 +129,7 @@ fun HomeView(
                     title = {
                         Text(
                             modifier = Modifier.padding(start = 15.dp),
-                            text = "DashBoard",
+                            text = "Home",
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
                                 fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
@@ -375,7 +376,7 @@ fun HomeViewContent(
                                         ),
                                         shape = RoundedCornerShape(25.dp),
                                         onClick = {
-
+                                            navController.navigate(NavConstants.TASK)
                                         }
                                     ) {
                                         Column(
@@ -393,7 +394,7 @@ fun HomeViewContent(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .padding(5.dp),
-                                                text = "Tasks And Assignments",
+                                                text = "Tasks",
                                                 maxLines = 2,
                                                 overflow = TextOverflow.Ellipsis,
                                                 style = TextStyle(
@@ -527,7 +528,8 @@ fun DrawerContent(
     var bgIcon by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth(0.9f)
+            .fillMaxHeight()
             .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {

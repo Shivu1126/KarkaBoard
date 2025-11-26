@@ -2,7 +2,12 @@ package com.sivaram.karkaboard.ui.faculty.taskmanagement.assigntask
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -74,6 +79,7 @@ import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.ValidationState
 import com.sivaram.karkaboard.ui.theme.KarkaBoardTheme
 import com.sivaram.karkaboard.ui.theme.overpassMonoBold
 import com.sivaram.karkaboard.ui.theme.overpassMonoMedium
+import com.sivaram.karkaboard.ui.theme.overpassMonoRegular
 import com.sivaram.karkaboard.utils.UtilityFunctions
 import kotlinx.coroutines.launch
 
@@ -173,9 +179,41 @@ fun AssignTaskViewContent(
     var expandBatchDropDown by rememberSaveable { mutableStateOf(false) }
 
     val assignTaskState by assignTaskViewModel.assignTaskState.collectAsState()
+    var attachmentUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var attachmentName by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(true) {
         assignTaskViewModel.getAvailableBatches()
+    }
+
+    val documentLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
+            val fileSize = context.contentResolver.openAssetFileDescriptor(uri, "r")?.use {
+                it.length
+            } ?: 0L
+
+            val fileSizeInMB = fileSize / (1024 * 1024)
+
+            if (fileSizeInMB > 5) {
+                Toast.makeText(context, "File size should be below 5 MB", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                attachmentUri = it
+                attachmentName = UtilityFunctions.getFileName(context, it) ?: ""
+            }
+        }
+        Log.d("resumeFileName", attachmentName)
+        Log.d("resumeUri", attachmentUri.toString())
     }
 
     Box(
@@ -382,7 +420,7 @@ fun AssignTaskViewContent(
                                 ) {
                                     Text(
                                         modifier = Modifier.weight(1f),
-                                        text = "${index+1}. $question",
+                                        text = "${index + 1}. $question",
                                         style = TextStyle(
                                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                                             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
@@ -497,8 +535,7 @@ fun AssignTaskViewContent(
                                                 "Please enter question",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                        }
-                                        else{
+                                        } else {
                                             questionList.add(questionContent.trim())
                                             questionContent = ""
                                         }
@@ -513,6 +550,104 @@ fun AssignTaskViewContent(
                                         Icon(
                                             modifier = Modifier.size(30.dp),
                                             painter = painterResource(R.drawable.ic_plus),
+                                            contentDescription = "Add Icon",
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Text(
+                            text = "OR",
+                            style = TextStyle(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                fontFamily = overpassMonoRegular
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Add Attachment",
+                            style = TextStyle(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                fontFamily = overpassMonoBold
+                            )
+                        )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(5.dp)
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                OutlinedCard(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(50.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    border = BorderStroke(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 10.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            modifier = Modifier.size(25.dp),
+                                            painter = painterResource(R.drawable.ic_attach),
+                                            contentDescription = "Attach Icon",
+                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                        Text(
+                                            modifier = Modifier.padding(start = 10.dp),
+                                            text = if (attachmentName.isEmpty()) "Upload a file (Max file: 5MB)" else attachmentName,
+                                            style = TextStyle(
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                                fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                                                fontFamily = overpassMonoMedium
+                                            )
+                                        )
+                                    }
+                                }
+                                OutlinedCard(
+                                    modifier = Modifier
+                                        .size(50.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    border = BorderStroke(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    onClick = {
+                                        documentLauncher.launch(
+                                            arrayOf(
+                                                "application/pdf", // PDF
+                                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+                                                "application/msword" // DOC (old Word format)
+                                            )
+                                        )
+                                    },
+                                ) {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Icon(
+                                            modifier = Modifier.size(30.dp),
+                                            painter = painterResource(R.drawable.ic_add_file),
                                             contentDescription = "Add Icon",
                                         )
                                     }
@@ -674,7 +809,7 @@ fun AssignTaskViewContent(
                                     Icon(
                                         modifier = Modifier.size(25.dp),
                                         painter = painterResource(R.drawable.ic_add),
-                                        contentDescription = "Add Password"
+                                        contentDescription = "Add"
                                     )
                                 }
                             }
@@ -769,10 +904,14 @@ fun AssignTaskViewContent(
                                 MaterialTheme.colorScheme.onPrimaryContainer
                             ),
                             onClick = {
-                                if(batches != null && batches?.isNotEmpty() == true)
+                                if (batches != null && batches?.isNotEmpty() == true)
                                     expandBatchDropDown = true
                                 else
-                                    Toast.makeText(context, "No batches available", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "No batches available",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                             }
                         ) {
                             Row(
@@ -863,23 +1002,27 @@ fun AssignTaskViewContent(
                         enabled = assignTaskState !is AssignTaskState.Loading,
                         onClick = {
                             val taskObj = TaskData(
-                                title = taskTitle,
-                                description = description,
+                                title = taskTitle.trim(),
+                                description = description.trim(),
                                 dueDate = dueDate ?: 0,
                                 tags = tagList,
                                 batchId = selectedBatchId,
-                                questions = questionList
+                                questions = questionList,
+                                attachmentUrl = attachmentUri.toString()
                             )
                             assignTaskViewModel.validateInputs(taskObj)
-                            when(val state = validationState){
+                            when (val state = validationState) {
                                 is ValidationState.Error ->
-                                    Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, state.message, Toast.LENGTH_SHORT)
+                                        .show()
+
                                 ValidationState.Idle -> Unit
 
                                 ValidationState.Success -> {
                                     taskObj.facultyId = userData?.uId ?: ""
                                     assignTaskViewModel.assignTask(taskObj)
                                 }
+
                                 else -> Unit
                             }
                         },
@@ -900,11 +1043,12 @@ fun AssignTaskViewContent(
                         ),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.inversePrimary),
                     ) {
-                        when(val state = assignTaskState){
+                        when (val state = assignTaskState) {
                             is AssignTaskState.Error -> {
                                 Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
                                 assignTaskViewModel.resetAssignTaskState()
                             }
+
                             AssignTaskState.Idle -> {
                                 Text(
                                     text = "Assign",
@@ -915,6 +1059,7 @@ fun AssignTaskViewContent(
                                     )
                                 )
                             }
+
                             AssignTaskState.Loading -> {
                                 CircularProgressIndicator(
                                     color = MaterialTheme.colorScheme.secondaryContainer,
@@ -922,8 +1067,13 @@ fun AssignTaskViewContent(
                                     strokeWidth = 4.dp
                                 )
                             }
+
                             is AssignTaskState.Success -> {
-                                Toast.makeText(context, "Task assigned successfully", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Task assigned successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 navController.popBackStack()
                                 assignTaskViewModel.resetAssignTaskState()
                             }

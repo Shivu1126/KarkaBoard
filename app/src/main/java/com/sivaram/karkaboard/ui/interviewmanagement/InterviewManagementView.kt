@@ -217,7 +217,7 @@ fun InterviewManagementViewContent(
         interviewManagementViewModel.getAllBatches()
     }
     Log.d("allBatchesData", allBatchesData.toString())
-    LaunchedEffect(allBatchesData, selectedBatchId) {
+    LaunchedEffect(allBatchesData, selectedBatchId, filterId) {
         when {
             selectedBatchId != null -> {
                 interviewManagementViewModel.getAppliedStudentDetail(selectedBatchId!!, filterId)
@@ -316,9 +316,9 @@ fun InterviewManagementViewContent(
                                     },
                                     onClick = {
                                         selectedBatchId = batch.docId
-                                        interviewManagementViewModel.getAppliedStudentDetail(
-                                            batch.docId, filterId
-                                        )
+//                                        interviewManagementViewModel.getAppliedStudentDetail(
+//                                            batch.docId, filterId
+//                                        )
                                         Log.d("selectedBatch", selectedBatch.toString())
                                         Log.d(
                                             "appliedStudentData",
@@ -399,9 +399,9 @@ fun InterviewManagementViewContent(
                                         },
                                         onClick = {
                                             filterId = index
-                                            interviewManagementViewModel.getAppliedStudentDetail(
-                                                selectedBatchId!!, filterId
-                                            )
+//                                            interviewManagementViewModel.getAppliedStudentDetail(
+//                                                selectedBatchId!!, filterId
+//                                            )
                                             expandFilterDropDown = false
                                         },
                                         modifier = Modifier

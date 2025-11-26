@@ -8,4 +8,5 @@ object DbConstants {
     const val BATCHES_TABLE = "batches"
     const val APPLICATION_TABLE = "applications"
     const val TASKS_TABLE = "tasks"
+    const val TASKS_SUBMISSION_TABLE = "tasks_submission"
 }

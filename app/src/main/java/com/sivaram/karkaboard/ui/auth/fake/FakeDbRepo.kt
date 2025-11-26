@@ -8,14 +8,18 @@ import com.sivaram.karkaboard.data.dto.AppliedStudentData
 import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.InterviewHistoryData
 import com.sivaram.karkaboard.data.dto.RolesData
+import com.sivaram.karkaboard.data.dto.StaffData
 import com.sivaram.karkaboard.data.dto.StudentData
 import com.sivaram.karkaboard.data.dto.TaskData
+import com.sivaram.karkaboard.data.dto.TaskSubmissionData
+import com.sivaram.karkaboard.data.dto.TaskViewData
 import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
 import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.AssignTaskState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
+import com.sivaram.karkaboard.ui.student.state.SubmitTaskState
 
 class FakeDbRepo: DatabaseRepository {
     override fun getRoles(): LiveData<List<RolesData>> {
@@ -76,5 +80,31 @@ class FakeDbRepo: DatabaseRepository {
 
     override suspend fun assignTask(taskData: TaskData): AssignTaskState {
         return AssignTaskState.Idle
+    }
+
+    override suspend fun getAssignedTasksByFaculty(
+        batchId: String,
+        userId: String
+    ): LiveData<List<TaskData>> {
+        return MutableLiveData(emptyList())
+    }
+
+    override suspend fun getTaskByBatch(studentId: String, batchId: String, status: String): LiveData<List<TaskViewData>> {
+        return MutableLiveData(emptyList())
+    }
+
+    override suspend fun getTaskById(taskId: String): LiveData<TaskData?> {
+        return MutableLiveData()
+    }
+
+    override suspend fun getTaskSubmissionById(taskSubmissionId: String): LiveData<TaskSubmissionData?> {
+        return MutableLiveData()
+    }
+
+    override suspend fun getFacultyById(facultyId: String): LiveData<StaffData?> {
+        return MutableLiveData()
+    }
+    override suspend fun updateSubmissionData(taskSubmissionData: TaskSubmissionData): SubmitTaskState{
+        return SubmitTaskState.Idle
     }
 }

@@ -54,8 +54,8 @@ class AssignTaskViewModel @Inject constructor(
         }
         else if(taskObj.description.trim().isEmpty())
             _validationState.value = ValidationState.Error("Please enter task description")
-        else if(taskObj.questions.isEmpty())
-            _validationState.value = ValidationState.Error("Please add one or more questions")
+        else if(taskObj.questions.isEmpty() && taskObj.attachmentUrl.isEmpty())
+            _validationState.value = ValidationState.Error("Please add questions or add attachment")
         else if(taskObj.tags.isEmpty())
             _validationState.value = ValidationState.Error("Please add one or more tags")
         else if(taskObj.dueDate < UtilityFunctions.getCurrentTimeInMillis())
