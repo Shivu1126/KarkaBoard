@@ -9,12 +9,12 @@
   <p align="center">
     A unified Student Progress Tracking & Recruitment Management System built for Students, Faculties, HR, and Admins.
     <br />
-    <a href="#-about-the-project"><strong>Explore the docs »</strong></a>
+     <a href="https://play.google.com/store/apps/details?id=com.sivaram.karkaboard">
+      <img alt="Get it on Google Play"
+           src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+           height="80" />
+     </a>
     <br />
-    <br />
-    <a href="https://github.com/Shivu1126/KarkaBoard/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/Shivu1126/KarkaBoard/issues">Request Feature</a>
   </p>
 </div>
 
