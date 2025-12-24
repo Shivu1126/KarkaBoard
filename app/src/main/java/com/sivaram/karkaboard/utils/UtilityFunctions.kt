@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import java.util.Date
 import java.util.Locale
+import androidx.core.net.toUri
 
 object UtilityFunctions {
     fun convertMillisToDate(millis: Long): String {
@@ -79,4 +80,10 @@ object UtilityFunctions {
     fun getCurrentTimeInMillis(): Long {
         return System.currentTimeMillis()
     }
+
+    fun isValidHttpUrl(url: String): Boolean {
+        val uri = url.toUri()
+        return uri.scheme == "http" || uri.scheme == "https"
+    }
+
 }

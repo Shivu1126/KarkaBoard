@@ -198,6 +198,21 @@ fun AssignTaskViewContent(
             } catch (e: SecurityException) {
                 e.printStackTrace()
             }
+            val contentResolver = context.contentResolver
+            val mimeType = contentResolver.getType(it)
+
+            val allowedMimeTypes = listOf(
+                "application/pdf"
+            )
+
+            if (mimeType !in allowedMimeTypes) {
+                Toast.makeText(
+                    context,
+                    "Only PDF files are allowed",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@let
+            }
             val fileSize = context.contentResolver.openAssetFileDescriptor(uri, "r")?.use {
                 it.length
             } ?: 0L

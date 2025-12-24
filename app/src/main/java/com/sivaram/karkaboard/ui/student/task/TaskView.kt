@@ -215,7 +215,7 @@ fun TaskViewContent(
                     .fillMaxSize(),
             ) {
                 ScrollableTabRow(
-                    selectedTabIndex = selectedTabIndex,
+                        selectedTabIndex = selectedTabIndex,
                     containerColor = MaterialTheme.colorScheme.secondaryContainer
                 ) {
                     tabItems.forEachIndexed { index, item ->

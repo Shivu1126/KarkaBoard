@@ -9,11 +9,14 @@ import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StaffData
 import com.sivaram.karkaboard.data.dto.StudentData
+import com.sivaram.karkaboard.data.dto.SubmissionByStatus
 import com.sivaram.karkaboard.data.dto.TaskData
 import com.sivaram.karkaboard.data.dto.TaskSubmissionData
 import com.sivaram.karkaboard.data.dto.TaskViewData
 import com.sivaram.karkaboard.data.dto.UserData
+import com.sivaram.karkaboard.data.dto.enums.SubmissionStatus
 import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.AssignTaskState
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.StudentLoadState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
@@ -40,4 +43,7 @@ interface DatabaseRepository {
     suspend fun getTaskSubmissionById(taskSubmissionId: String): LiveData<TaskSubmissionData?>
     suspend fun getFacultyById(facultyId: String): LiveData<StaffData?>
     suspend fun updateSubmissionData(taskSubmissionData: TaskSubmissionData): SubmitTaskState
+    suspend fun getBatchDetailsById(batchId: String): LiveData<BatchData?>
+
+    suspend fun getStudentsByTaskStatus(taskId: String, status: SubmissionStatus) : LiveData<List<SubmissionByStatus>>
 }

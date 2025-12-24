@@ -10,12 +10,15 @@ import com.sivaram.karkaboard.data.dto.InterviewHistoryData
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StaffData
 import com.sivaram.karkaboard.data.dto.StudentData
+import com.sivaram.karkaboard.data.dto.SubmissionByStatus
 import com.sivaram.karkaboard.data.dto.TaskData
 import com.sivaram.karkaboard.data.dto.TaskSubmissionData
 import com.sivaram.karkaboard.data.dto.TaskViewData
 import com.sivaram.karkaboard.data.dto.UserData
+import com.sivaram.karkaboard.data.dto.enums.SubmissionStatus
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
 import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.AssignTaskState
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.StudentLoadState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
@@ -106,5 +109,16 @@ class FakeDbRepo: DatabaseRepository {
     }
     override suspend fun updateSubmissionData(taskSubmissionData: TaskSubmissionData): SubmitTaskState{
         return SubmitTaskState.Idle
+    }
+
+    override suspend fun getBatchDetailsById(batchId: String): LiveData<BatchData?> {
+        return MutableLiveData()
+    }
+
+    override suspend fun getStudentsByTaskStatus(
+        taskId: String,
+        status: SubmissionStatus
+    ): LiveData<List<SubmissionByStatus>>  {
+        return MutableLiveData(emptyList())
     }
 }

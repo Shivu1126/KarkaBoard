@@ -15,6 +15,7 @@ import com.sivaram.karkaboard.data.dto.BatchData
 import com.sivaram.karkaboard.data.dto.RolesData
 import com.sivaram.karkaboard.data.dto.StaffData
 import com.sivaram.karkaboard.data.dto.StudentData
+import com.sivaram.karkaboard.data.dto.SubmissionByStatus
 import com.sivaram.karkaboard.data.dto.TaskData
 import com.sivaram.karkaboard.data.dto.TaskSubmissionData
 import com.sivaram.karkaboard.data.dto.TaskViewData
@@ -22,6 +23,7 @@ import com.sivaram.karkaboard.data.dto.UserData
 import com.sivaram.karkaboard.data.dto.enums.SubmissionStatus
 import com.sivaram.karkaboard.data.remote.db.DatabaseRepository
 import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.AssignTaskState
+import com.sivaram.karkaboard.ui.faculty.taskmanagement.state.StudentLoadState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.AcceptState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.ApplicationState
 import com.sivaram.karkaboard.ui.interviewmanagement.state.DeclineState
@@ -31,7 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import okhttp3.internal.concurrent.Task
 import kotlin.jvm.java
 
 class DatabaseRepositoryImpl : DatabaseRepository {
@@ -574,4 +575,86 @@ class DatabaseRepositoryImpl : DatabaseRepository {
             SubmitTaskState.Error("Something went wrong")
         }
     }
+
+    override suspend fun getBatchDetailsById(batchId: String): LiveData<BatchData?> {
+        val batchData = MutableLiveData<BatchData?>()
+        try {
+            firebaseFireStore.collection(DbConstants.BATCHES_TABLE).document(batchId)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val batchObj = snapshot.toObject(BatchData::class.java)
+                        batchData.value = batchObj
+                    }
+                }
+        } catch (e: Exception) {
+            batchData.value = null
+        }
+        return batchData
+    }
+
+    override suspend fun getStudentsByTaskStatus(
+        taskId: String,
+        status: SubmissionStatus
+    ): LiveData<List<SubmissionByStatus>> {
+        val submissionByStatus = MutableLiveData<List<SubmissionByStatus>>()
+        val result = mutableListOf<SubmissionByStatus>()
+        try{
+            if(status != SubmissionStatus.PENDING){
+                val taskSubmissionDoc = firebaseFireStore.collection(DbConstants.TASKS_SUBMISSION_TABLE)
+                    .whereEqualTo("taskId", taskId)
+                    .whereEqualTo("status", status.label)
+                    .get().await()
+                for(taskSnapshot in taskSubmissionDoc.documents){
+                    val taskSubmissionObj = taskSnapshot.toObject(TaskSubmissionData::class.java) ?: continue
+                    val studentDetailSnap = firebaseFireStore
+                        .collection(DbConstants.USER_TABLE)
+                        .whereEqualTo("uid", taskSubmissionObj.studentId)
+                        .get()
+                        .await()
+                    val studentObj = studentDetailSnap.documents.mapNotNull { it.toObject(UserData::class.java) }
+                    result.add(SubmissionByStatus(studentObj[0], taskSubmissionObj))
+                }
+            }
+            else{
+                val taskDataDoc = firebaseFireStore.collection(DbConstants.TASKS_TABLE).document(taskId).get().await()
+                val taskDataObj = taskDataDoc.toObject(TaskData::class.java)
+                val allStudentDoc = firebaseFireStore.collection(DbConstants.STUDENT_TABLE)
+                    .whereEqualTo("batchId", taskDataObj?.batchId)
+                    .get().await()
+                val taskSubmissionDoc = firebaseFireStore.collection(DbConstants.TASKS_SUBMISSION_TABLE)
+                    .whereEqualTo("taskId", taskId)
+                    .get().await()
+                val allStudentDataObjects = allStudentDoc.toObjects(StudentData::class.java)
+                val taskSubmissionDataObjects = taskSubmissionDoc.toObjects(TaskSubmissionData::class.java)
+                Log.d("AllStudentsFrom", "${taskDataObj?.batchId} -> $allStudentDataObjects")
+                val submittedStudentIds = taskSubmissionDataObjects
+                    .map { it.studentId }
+                    .toSet()
+                Log.d("SubmittedList", "$submittedStudentIds")
+                val notSubmittedStudents = allStudentDataObjects.filter { student ->
+                    student.uid !in submittedStudentIds
+                }
+                Log.d("NotSubmittedList", "$notSubmittedStudents")
+                notSubmittedStudents.forEach { student ->
+                    val studentDetailSnap = firebaseFireStore
+                        .collection(DbConstants.USER_TABLE)
+                        .whereEqualTo("uid", student.uid)
+                        .get()
+                        .await()
+                    val studentObj = studentDetailSnap.documents.mapNotNull { it.toObject(UserData::class.java) }
+                    result.add(SubmissionByStatus(studentObj[0], TaskSubmissionData()))
+                }
+                Log.d("PendingList", "$result")
+            }
+            submissionByStatus.value = result
+        }
+        catch (e: Exception){
+            submissionByStatus.value = emptyList()
+        }
+        return submissionByStatus
+    }
+
 }
